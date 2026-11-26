@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Espelhos JEAN</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#f4f5f8;--sf:#ffffff;--sf2:#eceef3;--ln:#dde1e8;--tx:#151b2a;--mt:#667085;
+  --ac:#b07d2b;--acs:#f3e7d2;--acx:#ffffff;--ink:#1d2a4a;
+  --ok:#1f8a4c;--wn:#b7791f;--bd:#c2412d;--in:#2e62c9;
+  --fd:"Outfit","Segoe UI",system-ui,sans-serif;--fb:"Inter",system-ui,-apple-system,sans-serif;--fm:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1320;--sf:#151c2c;--sf2:#1d2638;--ln:#283349;--tx:#eef1f7;--mt:#94a0b8;--ac:#e0b062;--acs:#2e2717;--acx:#1a1408;--ink:#c9d4ee;--ok:#5fd08e;--wn:#f0b84a;--bd:#ff8a76;--in:#86aaff;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1320;--sf:#151c2c;--sf2:#1d2638;--ln:#283349;--tx:#eef1f7;--mt:#94a0b8;--ac:#e0b062;--acs:#2e2717;--acx:#1a1408;--ink:#c9d4ee;--ok:#5fd08e;--wn:#f0b84a;--bd:#ff8a76;--in:#86aaff;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--tx);font:14px/1.5 var(--fb);margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.num{font-family:var(--fm);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.mt{color:var(--mt)}.sm{font-size:12.5px}
+h1{font:600 34px/1.1 var(--fd);margin:0;letter-spacing:-.01em;text-wrap:balance}
+h2{font:600 17px/1.25 var(--fd);margin:0}
+.eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mt);font-weight:600}
+.app{display:flex;min-height:100vh}
+nav.rail{position:sticky;top:0;height:100vh;width:212px;flex:none;background:var(--sf);border-right:1px solid var(--ln);display:flex;flex-direction:column;gap:2px;padding:18px 12px;overflow-y:auto}
+.brand{display:flex;gap:10px;align-items:center;padding:0 8px 16px}
+.brand .lg{width:36px;height:36px;border-radius:10px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:700 18px var(--fd)}
+.brand b{font:600 17px var(--fd);display:block;line-height:1.1}.brand small{color:var(--mt);font-size:11.5px}
+nav.rail a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;color:var(--mt);text-decoration:none;font-weight:500}
+nav.rail a:hover{background:var(--sf2);color:var(--tx)}
+nav.rail a.on{background:var(--acs);color:var(--tx)}
+nav.rail svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+nav.rail .sp{flex:1}
+.live{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--mt)}
+.live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok)}
+main{flex:1;min-width:0}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 16px 90px;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+.panel{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:16px;min-width:0}
+.g{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.kv .k{font-size:11.5px;color:var(--mt);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.kv .v{font:600 22px/1.15 var(--fd);margin-top:2px}
+.big{font:600 46px/1 var(--fd);letter-spacing:-.02em;color:var(--ac)}
+.btn{border:1px solid var(--ln);background:var(--sf);border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:600;font-size:13.5px;display:inline-flex;gap:6px;align-items:center;text-decoration:none;color:var(--tx)}
+.btn:hover{border-color:var(--ac)}
+.btn.p{background:var(--ac);border-color:var(--ac);color:var(--acx)}
+.btn.s{padding:5px 10px;font-size:12.5px}
+.seg{display:inline-flex;border:1px solid var(--ln);border-radius:10px;padding:3px;gap:2px;background:var(--sf);flex-wrap:wrap}
+.seg button{border:0;background:none;padding:6px 12px;border-radius:7px;cursor:pointer;color:var(--mt);font-weight:500;font-size:13px}
+.seg button.on{background:var(--acs);color:var(--tx);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--ln);background:var(--sf);border-radius:99px;padding:5px 11px;cursor:pointer;font-size:12.5px}
+.chip:hover{border-color:var(--ac)}
+.chip.on{background:var(--ac);border-color:var(--ac);color:var(--acx);font-weight:600}
+.search{display:flex;align-items:center;gap:8px;border:1px solid var(--ln);background:var(--sf);border-radius:12px;padding:0 12px;height:44px;flex:1;min-width:220px}
+.search input{border:0;background:transparent;outline:0;flex:1;min-width:0;font-size:14.5px}
+.fld{border:1px solid var(--ln);background:var(--sf);border-radius:9px;padding:7px 10px;min-width:0}
+.ticker{overflow:hidden;white-space:nowrap;border:1px solid var(--ln);background:var(--sf);border-radius:12px}
+.ticker .tk{display:inline-flex;gap:26px;padding:10px 0;animation:tk 90s linear infinite}
+.ticker:hover .tk{animation-play-state:paused}
+@keyframes tk{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.ticker .tk{animation:none}}
+.tk span{font-size:13px}.tk i{font-style:normal;color:var(--mt);font-family:var(--fm);font-size:12px;margin-right:6px}
+.pill{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.st-vendida{background:color-mix(in srgb,var(--bd) 16%,transparent);color:var(--bd)}
+.st-reservada{background:color-mix(in srgb,var(--wn) 18%,transparent);color:var(--wn)}
+.st-processo_final{background:color-mix(in srgb,var(--in) 16%,transparent);color:var(--in)}
+.st-disponivel{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.st-suspensa,.st-novo{background:var(--sf2);color:var(--mt)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:140px}
+.bars>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:5px;font-size:11.5px;color:var(--mt)}
+.bars i{display:block;width:100%;background:var(--ac);border-radius:6px 6px 2px 2px;min-height:3px;opacity:.75}
+.bars>div.hj i{opacity:1}
+.bars b{color:var(--tx);font-family:var(--fm);font-weight:500}
+.list{display:flex;flex-direction:column}
+.li{display:flex;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--ln);min-width:0}
+.li:last-child{border-bottom:0}
+.li .grow{flex:1;min-width:0}
+.li .grow b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.clk{cursor:pointer}.clk:hover{background:var(--sf2)}
+.cov{position:relative;border-radius:12px;overflow:hidden;display:flex;align-items:flex-end;color:#fff;font:700 28px var(--fd);padding:12px;letter-spacing:-.01em;background-size:cover!important;background-position:center!important;text-shadow:0 1px 8px #0009}
+.cov small{position:absolute;top:10px;left:10px;font:600 11px var(--fb);background:#0009;padding:3px 8px;border-radius:99px;letter-spacing:0;text-shadow:none}
+.mini{width:46px;height:46px;flex:none;border-radius:10px;display:grid;place-items:center;color:#fff;font:700 15px var(--fd);background-size:cover!important;background-position:center!important}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column}
+.card:hover{border-color:var(--ac)}
+.card .cov{height:150px;border-radius:0}
+.card .b{padding:12px 14px;display:flex;flex-direction:column;gap:3px}
+.card .pr{font:600 19px var(--fd);margin-top:4px}
+.prog{height:8px;border-radius:99px;background:var(--sf2);overflow:hidden;display:flex}
+.prog i{display:block;height:100%}
+.lay{display:grid;grid-template-columns:270px 1fr;gap:16px;align-items:start}
+@media(max-width:980px){.lay{grid-template-columns:1fr}}
+.side{display:flex;flex-direction:column;gap:14px;position:sticky;top:12px}
+@media(max-width:980px){.side{position:static}}
+.side h3{font:600 14px var(--fd);margin:0 0 8px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--ln);vertical-align:middle}
+th{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--mt);font-weight:600}
+td.r,th.r{text-align:right}
+.ox{overflow-x:auto}
+.cmp{display:grid;grid-template-columns:repeat(var(--n,5),minmax(190px,1fr));gap:12px}
+.cmp .panel{display:flex;flex-direction:column;gap:6px}
+.cmp .panel.base{border-color:var(--ac)}
+.empty{color:var(--mt);padding:16px 4px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:9px 16px;border-radius:10px;font-weight:600;z-index:60;font-size:13px}
+.pre{white-space:pre-wrap;background:var(--sf2);border-radius:12px;padding:14px;font-size:13.5px;line-height:1.55}
+@media(max-width:820px){
+  .app{flex-direction:column}
+  nav.rail{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;width:auto;flex-direction:row;border-right:0;border-top:1px solid var(--ln);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));z-index:20;overflow-x:auto;gap:0}
+  nav.rail .brand,nav.rail .sp,nav.rail .foot{display:none}
+  nav.rail a{flex-direction:column;gap:2px;font-size:10.5px;padding:6px 10px;flex:none}
+  h1{font-size:28px}.big{font-size:38px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" id="rail" aria-label="Seções"></nav>
+  <main><div class="wrap" id="view"></div></main>
+</div>
+<script>
+"use strict";
+/* Os dados vêm de dados/espelho.json, gravado pelo robô (robo/orulo.mjs) de hora em hora.
+   Se existir dados/base.json (mesmo formato), ele é somado: os projetos do robô têm prioridade. */
+var F={id:0,n:1,iid:2,inc:3,bai:4,zona:5,fase:6,ent:7,disp:8,res:9,proc:10,vend:11,tot:12,pp:13,pv:14,dorm:15,m2a:16,m2b:17,capa:18,desc:19,tab:20,tabEm:21,stt:22,lat:23,lng:24,ap:25,upd:26,end:27,cid:28,vaga:29,m2p:30,cat:31};
+var FASE={lanc:"Lançamento",breve:"Breve lançamento",obras:"Em obras",pronto:"Pronto"},FORD={pronto:0,obras:1,lanc:2,breve:3};
+var ZONA={centro:"Centro",sul:"Zona Sul",oeste:"Zona Oeste",leste:"Zona Leste",norte:"Zona Norte",gsp:"Grande SP"};
+var DORM={S:"Studio","1":"1 dorm","2":"2 dorms","3":"3 dorms","4":"4 dorms",L:"Loja"};
+var CAT={H1:"HIS 1",H2:"HIS 2",H:"HIS",P:"HMP",R:"R2V",N:"NR",F:"F"};
+var ST={disponivel:"Disponível",reservada:"Reservada",processo_final:"Em processo",vendida:"Vendida",suspensa:"Venda suspensa",novo:"Nova no espelho"};
+var FOTO_BASE="https://luizmiguel08.github.io/espelhos/";
+var DAY=864e5;
+var D={p:[],m:[],em:0,ok:false,byId:{},erros:[]},ST8="carregando",UI={f:{q:"",modo:"pp",min:"",max:"",dorm:[],zona:[],fase:[],inc:[],cat:[],vaga:"",ent:"",sort:"vend"},rank:"vend",cmp:{id:"",mot:"parecidos",modo:"pp",km:3},tq:"",mper:"7"};
+
+function $(s,r){return (r||document).querySelector(s)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function brl(v){return v==null||isNaN(v)?"—":"R$ "+Math.round(v).toLocaleString("pt-BR")}
+function brlc(v){if(v==null||isNaN(v))return "—";if(v>=1e6)return "R$ "+(v/1e6).toLocaleString("pt-BR",{maximumFractionDigits:v>=1e8?0:1})+" mi";if(v>=1e3)return "R$ "+Math.round(v/1e3)+" mil";return brl(v)}
+function m2(v){return v==null?"—":v.toLocaleString("pt-BR",{maximumFractionDigits:2})+" m²"}
+function pc(a,b){return b?Math.round(a/b*100):0}
+function sod(t){var d=new Date(t||Date.now());d.setHours(0,0,0,0);return d.getTime()}
+function hm(t){return new Date(t).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}
+function dm(t){return new Date(t).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})}
+function quando(t){var d=Math.round((sod()-sod(t))/DAY);return d<=0?"hoje, "+hm(t):d===1?"ontem, "+hm(t):dm(t)+", "+hm(t)}
+function entTxt(p){var f=p[F.fase],e=p[F.ent];if(f==="pronto")return "Pronto";if(!e)return FASE[f]||"—";var a=e.split("-");return new Date(+a[0],+a[1]-1,1).toLocaleDateString("pt-BR",{month:"short",year:"numeric"}).replace(".","")}
+function hue(s){var h=0;s=String(s);for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h}
+function foto(p){var c=p[F.capa];if(!c)return "";return /^https?:/.test(c)?c:FOTO_BASE+String(c).replace(/^\//,"")}
+function covBg(p){var h=hue(p[F.iid]||p[F.id]),g="linear-gradient(140deg,hsl("+h+" 38% 34%),hsl("+((h+38)%360)+" 46% 16%))",f=foto(p);return f?"background:linear-gradient(180deg,#0000 35%,#000b),url('"+f.replace(/'/g,"%27")+"') center/cover,"+g:"background:"+g}
+function ini(n){return String(n).replace(/[^\p{L}\p{N} ]/gu,"").split(/\s+/).filter(function(w){return w.length>1||/\d/.test(w)}).slice(0,2).map(function(w){return w[0]}).join("").toUpperCase()}
+function iniOuFoto(p){return foto(p)?"":esc(ini(p[F.n]))}
+function toast(m){var t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove()},2400)}
+function copy(t){try{navigator.clipboard.writeText(t).then(function(){toast("Copiado")},function(){toast("Selecione e copie o texto")})}catch(e){toast("Selecione e copie o texto")}}
+function P(id){return D.byId[id]}
+function dist(a,b){if(a[F.lat]==null||b[F.lat]==null)return null;var R=6371,dl=(b[F.lat]-a[F.lat])*Math.PI/180,dg=(b[F.lng]-a[F.lng])*Math.PI/180,x=Math.sin(dl/2)**2+Math.cos(a[F.lat]*Math.PI/180)*Math.cos(b[F.lat]*Math.PI/180)*Math.sin(dg/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
+function perto(a,b){var d=dist(a,b);if(d!=null)return d;return a[F.bai]&&a[F.bai]===b[F.bai]?0.5:a[F.zona]&&a[F.zona]===b[F.zona]?4:null}
+function preco(p,modo){var v=p[modo==="pv"?F.pv:F.pp];return v==null?p[F.pp]:v}
+function dorms(p){return String(p[F.dorm]||"").split("").map(function(c){return DORM[c]||c})}
+function vendas7(){var a={},t=Date.now()-7*DAY;D.m.forEach(function(x){if(x[4]*1000>=t&&x[3]==="vendida")a[x[0]]=(a[x[0]]||0)+1});return a}
+
+var ICO={
+ inicio:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+ imoveis:'<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2"/>',
+ pregao:'<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>',
+ tabelas:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>',
+ comparar:'<rect x="3" y="4" width="7" height="16" rx="1.5"/><rect x="14" y="4" width="7" height="16" rx="1.5"/>',
+ mercado:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+ resumo:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>'
+};
+var NAV=[["inicio","Início"],["imoveis","Imóveis"],["pregao","Pregão"],["tabelas","Tabelas"],["comparar","Comparar"],["mercado","Mercado"],["resumo","Resumo do dia"]];
+var cur="inicio",R={},A={};
+function rail(){
+  var v=cur.indexOf("p-")===0?"tabelas":cur;
+  $("#rail").innerHTML='<div class="brand"><div class="lg">J</div><div><b>Espelhos</b><small>JEAN Investimentos</small></div></div>'+NAV.map(function(n){return '<a href="#'+n[0]+'" class="'+(v===n[0]?"on":"")+'"><svg viewBox="0 0 24 24">'+ICO[n[0]]+'</svg>'+n[1]+'</a>'}).join("")+'<div class="sp"></div><div class="foot" style="padding:8px 10px;display:flex;flex-direction:column;gap:8px">'+(D.ok?'<span class="live">Atualizado '+quando(D.em)+'</span><span class="sm mt">O robô lê os portais de hora em hora</span>':'')+'<button class="btn s" data-a="tema">Tema claro/escuro</button></div>';
+}
+function go(){var h=(location.hash||"").slice(1);cur=h&&(R[h]||(h.indexOf("p-")===0&&P(h.slice(2))))?h:"inicio";render();window.scrollTo(0,0)}
+function render(){rail();var v=$("#view");if(!D.ok){v.innerHTML=vazio();return}var k=cur.indexOf("p-")===0?"projeto":cur,f=k==="projeto"?function(){return R.projeto(cur.slice(2))}:R[cur];v.innerHTML=f();if(A[k])A[k]()}
+function render2(){var y=window.scrollY;render();window.scrollTo(0,y)}
+function vazio(){
+  if(ST8==="carregando")return '<div class="panel"><p class="mt">Carregando os espelhos…</p></div>';
+  return '<div class="top"><div><div class="eyebrow">Espelhos JEAN</div><h1>Ainda não há dados</h1></div></div><div class="panel"><p>O robô ainda não terminou a primeira leitura dos portais. Volte em alguns minutos.</p></div>';
+}
+
+/* ---------- Início ---------- */
+R.inicio=function(){
+  var now=Date.now(),h=new Date().getHours(),sau=h<12?"Bom dia":h<18?"Boa tarde":"Boa noite";
+  var livres=D.p.filter(function(p){return p[F.disp]>0}).length,ulv=D.p.reduce(function(a,p){return a+(p[F.disp]||0)},0);
+  var dias=[];for(var i=6;i>=0;i--){dias.push({t:sod(now-i*DAY),n:0,v:0,r:0,pr:0})}
+  D.m.forEach(function(x){var t=x[4]*1000;for(var i=0;i<7;i++){if(t>=dias[i].t&&t<dias[i].t+DAY){if(x[3]==="vendida"){dias[i].n++;dias[i].v+=x[5]||0}else if(x[3]==="reservada")dias[i].r++;else if(x[3]==="processo_final")dias[i].pr++}}});
+  var tv=0,tn=0,tr=0,tp=0;dias.forEach(function(d){tv+=d.v;tn+=d.n;tr+=d.r;tp+=d.pr});var mx=Math.max.apply(null,dias.map(function(d){return d.n}).concat([1]));
+  var v7=vendas7(),top=Object.keys(v7).filter(P).sort(function(a,b){return v7[b]-v7[a]})[0],tp1=top&&P(top);
+  if(!tp1)tp1=D.p.filter(function(p){return p[F.disp]>0}).sort(function(a,b){return b[F.vend]/(b[F.tot]||1)-a[F.vend]/(a[F.tot]||1)})[0];
+  var hojeV=D.m.filter(function(x){return x[4]*1000>=sod()&&x[3]==="vendida"&&P(x[0])}).length;
+  var rec=D.p.slice().sort(function(a,b){return String(b[F.upd]).localeCompare(String(a[F.upd]))}).slice(0,6);
+  return '<div class="top"><div><div class="eyebrow">'+new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"})+'</div><h1>'+sau+', Jean</h1><div class="sm mt" style="margin-top:4px">'+D.p.length+' projetos nos espelhos · '+livres+' com unidade livre · '+ulv.toLocaleString("pt-BR")+' unidades livres</div></div></div>'+
+  '<form class="search" id="hs" role="search"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="hsq" placeholder="Projeto, bairro, rua ou metrô" autocomplete="off"></form>'+
+  ticker()+
+  '<div class="g g2">'+
+   (tp1?'<section class="panel clk" data-p="'+esc(tp1[F.id])+'" style="padding:0;overflow:hidden;display:flex;flex-direction:column"><div class="cov" style="flex:1;min-height:240px;'+covBg(tp1)+'"><small>'+(v7[tp1[F.id]]?'1º em vendas na semana · '+v7[tp1[F.id]]+' vendas':pc(tp1[F.vend],tp1[F.tot])+'% vendido')+'</small><div><div style="font-size:30px">'+esc(tp1[F.n])+'</div><div style="font:500 13px var(--fb);opacity:.9">'+esc(tp1[F.inc])+' · '+esc(tp1[F.bai])+'</div></div></div><div style="padding:14px 16px;display:flex;gap:18px;flex-wrap:wrap" class="sm"><span>A partir de <b class="num">'+brlc(tp1[F.pv]||tp1[F.pp])+'</b></span><span><b class="num">'+tp1[F.disp]+'</b> livres</span><span>'+entTxt(tp1)+'</span></div></section>':'')+
+   '<section class="panel"><div class="eyebrow">VGV vendido nos espelhos em 7 dias</div><div class="big num" style="margin:8px 0 10px">'+brlc(tv)+'</div><div class="g g4" style="grid-template-columns:repeat(3,1fr)">'+kv("Vendas",tn)+kv("Reservas",tr)+kv("Em processo",tp)+'</div>'+
+    '<div class="bars" style="margin-top:14px">'+dias.map(function(d,i){return '<div class="'+(i===6?"hj":"")+'" title="'+brl(d.v)+'"><b>'+d.n+'</b><i style="height:'+(d.n/mx*100)+'%"></i>'+(i===6?"hoje":new Date(d.t).toLocaleDateString("pt-BR",{weekday:"short"}).replace(".",""))+'</div>'}).join("")+'</div>'+
+    '<p class="sm mt" style="margin:10px 0 0">Soma do preço de tabela das unidades que mudaram para vendida desde a última leitura do robô.</p><a class="btn s" href="#pregao" style="margin-top:8px">Abrir o pregão de hoje · '+hojeV+' vendas</a></section>'+
+  '</div>'+
+  '<div class="g g2">'+rankBox()+
+   '<section class="panel"><div style="display:flex;justify-content:space-between;align-items:baseline"><h2>Espelhos atualizados</h2><a class="sm" href="#tabelas" style="color:var(--ac)">Ver todos</a></div><div class="list" style="margin-top:6px">'+rec.map(function(p){return liP(p,'<span class="sm mt">'+quando(new Date(p[F.upd]).getTime())+'</span>')}).join("")+'</div></section></div>';
+};
+A.inicio=function(){var f=$("#hs");if(f)f.onsubmit=function(e){e.preventDefault();UI.f.q=$("#hsq").value;location.hash="imoveis"}};
+function kv(k,v){return '<div class="kv"><div class="k">'+k+'</div><div class="v num">'+v+'</div></div>'}
+function liP(p,right){return '<div class="li clk" data-p="'+esc(p[F.id])+'"><div class="mini" style="'+covBg(p)+'">'+iniOuFoto(p)+'</div><div class="grow"><b>'+esc(p[F.n])+'</b><span class="sm mt">'+esc(p[F.inc])+' · '+esc(p[F.bai]||"")+'</span></div>'+(right||"")+'</div>'}
+function ticker(){
+  var it=D.m.filter(function(x){return P(x[0])&&x[3]!=="novo"}).slice(0,40);if(!it.length)return "";
+  var h=it.map(function(x){var p=P(x[0]);return '<span><i>'+hm(x[4]*1000)+'</i><b>'+esc(p[F.ap]||p[F.n])+' '+esc(x[1])+'</b> <span class="pill st-'+x[3]+'">'+(ST[x[3]]||x[3]).toLowerCase()+'</span> <span class="mt num">'+(x[5]?brlc(x[5]):"")+'</span></span>'}).join("");
+  return '<div class="ticker" aria-label="Ao vivo"><div class="tk"><span class="live" style="padding-left:14px"><b>Ao vivo</b></span>'+h+h+'</div></div>';
+}
+function rankBox(){
+  var k=UI.rank,a={},t=Date.now()-7*DAY;D.m.forEach(function(x){if(x[4]*1000<t||!P(x[0]))return;var key=k==="inc"?P(x[0])[F.inc]:x[0];a[key]=a[key]||{v:0,r:0,vg:0};if(x[3]==="vendida"){a[key].v++;a[key].vg+=x[5]||0}else if(x[3]==="reservada")a[key].r++});
+  var ks=Object.keys(a).filter(function(x){return a[x].v||a[x].r}).sort(function(x,y){return a[y].v-a[x].v||a[y].r-a[x].r}).slice(0,8);
+  return '<section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2>Quem mais vende</h2><div class="seg">'+[["vend","Projetos"],["inc","Incorporadoras"]].map(function(x){return '<button data-rank="'+x[0]+'" class="'+(k===x[0]?"on":"")+'">'+x[1]+'</button>'}).join("")+'</div></div><div class="sm mt">Últimos 7 dias</div><div class="list" style="margin-top:6px">'+
+   (ks.length?ks.map(function(key,i){var r=a[key];if(k==="inc")return '<div class="li"><span class="num mt" style="width:22px">'+(i+1)+'º</span><div class="grow"><b>'+esc(key)+'</b><span class="sm mt">'+brlc(r.vg)+' em vendas</span></div><span class="num"><b>'+r.v+'</b> <span class="mt sm">vend.</span></span><span class="num mt sm">'+r.r+' res.</span></div>';return liP(P(key),'<span class="num"><b>'+r.v+'</b> <span class="mt sm">vend.</span></span><span class="num mt sm">'+r.r+' res.</span>')}).join(""):'<div class="empty">Sem movimentações na semana ainda. O robô registra cada venda e reserva a partir da primeira leitura.</div>')+'</div></section>';
+}
+
+/* ---------- Imóveis ---------- */
+function filtrar(){
+  var f=UI.f,q=f.q.trim().toLowerCase(),v7=vendas7(),min=+String(f.min).replace(/\D/g,"")||0,max=+String(f.max).replace(/\D/g,"")||0,ent=f.ent?+f.ent:0;
+  var r=D.p.filter(function(p){var pr=preco(p,f.modo),txt=(p[F.n]+" "+p[F.inc]+" "+p[F.bai]+" "+(p[F.end]||"")+" "+(p[F.desc]||"")+" "+(p[F.ap]||"")).toLowerCase(),dc=String(p[F.dorm]||""),cats=String(p[F.cat]||"").split(",");
+    return p[F.disp]>0&&(!q||txt.indexOf(q)>=0)&&(!min||(pr!=null&&pr>=min))&&(!max||(pr!=null&&pr<=max))&&(!f.dorm.length||f.dorm.some(function(d){return dc.indexOf(d)>=0}))&&(!f.zona.length||f.zona.indexOf(p[F.zona])>=0)&&(!f.fase.length||f.fase.indexOf(p[F.fase])>=0)&&(!f.inc.length||f.inc.indexOf(p[F.iid])>=0)&&(!f.cat.length||f.cat.some(function(c){return cats.some(function(x){return x===c||(c==="H"&&/^H/.test(x))})}))&&(!f.vaga||p[F.vaga]===f.vaga||(f.vaga==="algumas"&&p[F.vaga]==="todas"))&&(!ent||p[F.fase]==="pronto"||(p[F.ent]&&+p[F.ent].slice(0,4)<=ent))});
+  var s=f.sort;r.sort(s==="preco"?function(a,b){return (preco(a,f.modo)||9e12)-(preco(b,f.modo)||9e12)}:s==="m2p"?function(a,b){return (a[F.m2p]||9e9)-(b[F.m2p]||9e9)}:s==="ent"?function(a,b){return (FORD[a[F.fase]]-FORD[b[F.fase]])||String(a[F.ent]||"0").localeCompare(String(b[F.ent]||"0"))}:s==="livres"?function(a,b){return b[F.disp]-a[F.disp]}:function(a,b){return (v7[b[F.id]]||0)-(v7[a[F.id]]||0)||b[F.disp]-a[F.disp]});
+  return r;
+}
+R.imoveis=function(){
+  var f=UI.f,r=filtrar(),v7=vendas7(),ulv=r.reduce(function(a,p){return a+p[F.disp]},0),tot=D.p.reduce(function(a,p){return a+p[F.disp]},0);
+  var mp=D.p.filter(function(p){return p[F.disp]>0&&p[F.pp]}).sort(function(a,b){return a[F.pp]-b[F.pp]})[0];
+  var incs={};D.p.forEach(function(p){if(p[F.disp]>0)incs[p[F.iid]]=p[F.inc]});
+  var grp=function(t,key,opts){return '<div><h3>'+t+'</h3><div class="chips">'+opts.map(function(o){var on=f[key].indexOf(o[0])>=0;return '<button class="chip'+(on?" on":"")+'" data-fk="'+key+'" data-fv="'+esc(o[0])+'">'+esc(o[1])+'</button>'}).join("")+'</div></div>'};
+  return '<div class="top"><div><h1>Imóveis</h1><div class="sm mt" style="margin-top:4px">'+D.p.length+' projetos · '+tot.toLocaleString("pt-BR")+' unidades livres nos espelhos</div></div><a class="btn" href="#comparar">Comparar</a></div>'+
+  '<form class="search" id="is" role="search"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="isq" placeholder="Projeto, bairro, rua ou metrô" value="'+esc(f.q)+'" autocomplete="off"></form>'+
+  '<div class="lay"><aside class="side panel"><div><div style="display:flex;justify-content:space-between;align-items:center"><h3>Preço</h3><span class="sm mt">por unidade</span></div>'+
+   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px"><input class="fld" id="fmin" inputmode="numeric" placeholder="De R$" value="'+esc(f.min)+'"><input class="fld" id="fmax" inputmode="numeric" placeholder="Até R$" value="'+esc(f.max)+'"></div><div class="chips" style="margin-top:8px">'+[250,300,400,500,750,1000].map(function(v){return '<button class="chip'+(+f.max===v*1000?" on":"")+'" data-fmax="'+v*1000+'">até '+(v>=1000?(v/1000).toLocaleString("pt-BR")+" mi":v+" mil")+'</button>'}).join("")+'</div></div>'+
+   grp("Dormitórios","dorm",[["S","Studio"],["1","1 dorm"],["2","2 dorms"],["3","3+ dorms"],["L","Loja"]])+
+   grp("Região","zona",Object.keys(ZONA).map(function(k){return[k,ZONA[k]]}))+
+   grp("Fase","fase",[["lanc","Lançamento"],["breve","Breve"],["obras","Em obras"],["pronto","Pronto"]])+
+   '<div><h3>Entrega até</h3><select class="fld" id="fent" style="width:100%"><option value="">Qualquer data</option>'+[2026,2027,2028,2029,2030].map(function(y){return '<option'+(+f.ent===y?" selected":"")+'>'+y+'</option>'}).join("")+'</select></div>'+
+   grp("Enquadramento","cat",[["H","HIS"],["P","HMP"],["R","R2V"],["N","NR"]])+
+   grp("Incorporadora","inc",Object.keys(incs).sort(function(a,b){return incs[a].localeCompare(incs[b])}).map(function(k){return[k,incs[k]]}))+
+   '<button class="btn s" data-a="limpar">Limpar filtros</button></aside>'+
+  '<div style="display:flex;flex-direction:column;gap:14px;min-width:0">'+(mp?'<div class="g g4"><div class="panel clk" data-p="'+esc(mp[F.id])+'"><div class="eyebrow">Menor preço livre</div><div class="num" style="font-size:18px;margin-top:2px">'+brl(mp[F.pp])+'</div><div class="sm mt">'+esc(mp[F.n])+'</div></div></div>':'')+
+   '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><b class="num" style="font-size:18px">'+r.length+'</b> projetos com unidade livre <span class="mt sm">· '+ulv.toLocaleString("pt-BR")+' unidades</span></div><select class="fld" id="fsort"><option value="vend">Mais vendidos (7 dias)</option><option value="preco">Menor preço</option><option value="m2p">Menor R$/m²</option><option value="ent">Entrega mais próxima</option><option value="livres">Mais unidades livres</option></select></div>'+
+   (r.length?'<div class="cards">'+r.slice(0,UI.lim||60).map(function(p){return card(p,v7[p[F.id]])}).join("")+'</div>'+(r.length>(UI.lim||60)?'<button class="btn" data-a="mais" style="align-self:center">Mostrar mais</button>':''):'<div class="panel empty">Nenhum projeto com esses filtros.</div>')+'</div></div>';
+};
+function card(p,v){var pr=preco(p,UI.f.modo);return '<article class="card" data-p="'+esc(p[F.id])+'" tabindex="0"><div class="cov" style="'+covBg(p)+'">'+(v?'<small>'+v+' venda'+(v>1?"s":"")+' na semana</small>':p[F.fase]?'<small>'+esc(FASE[p[F.fase]]||"")+'</small>':'')+iniOuFoto(p)+'</div><div class="b"><b style="font-size:15px">'+esc(p[F.n])+'</b><span class="sm mt">'+esc(p[F.inc])+' · '+esc(p[F.bai]||"")+'</span><div class="pr num">'+(pr?brlc(pr):"Sem preço")+'</div><div class="sm mt">'+dorms(p).join(" · ")+(p[F.m2a]?' · '+m2(p[F.m2a])+(p[F.m2b]&&p[F.m2b]!==p[F.m2a]?" a "+m2(p[F.m2b]):""):'')+'</div><div class="sm" style="display:flex;justify-content:space-between;margin-top:4px"><span><b class="num">'+p[F.disp]+'</b> livres</span><span class="mt">'+entTxt(p)+'</span></div></div></article>'}
+A.imoveis=function(){
+  var f=UI.f;$("#is").onsubmit=function(e){e.preventDefault()};var q=$("#isq");q.oninput=function(){f.q=q.value;UI.lim=60;render2();var z=$("#isq");z.focus();z.setSelectionRange(z.value.length,z.value.length)};
+  [["#fmin","min"],["#fmax","max"]].forEach(function(x){var el=$(x[0]);el.onchange=function(){f[x[1]]=el.value;render2()}});
+  $("#fent").onchange=function(e){f.ent=e.target.value;render2()};var s=$("#fsort");s.value=f.sort;s.onchange=function(){f.sort=s.value;render2()};
+};
+
+/* ---------- Projeto ---------- */
+R.projeto=function(id){
+  var p=P(id),ms=D.m.filter(function(x){return x[0]===id}),v7=ms.filter(function(x){return x[3]==="vendida"&&x[4]*1000>=Date.now()-7*DAY}).length,tot=p[F.tot]||1;
+  var near=D.p.filter(function(o){return o!==p&&o[F.disp]>0}).map(function(o){return[o,perto(p,o)]}).filter(function(x){return x[1]!=null&&x[1]<=2}).sort(function(a,b){return a[1]-b[1]}).slice(0,5);
+  var maps="https://www.google.com/maps/search/?api=1&query="+(p[F.lat]!=null?p[F.lat]+","+p[F.lng]:encodeURIComponent((p[F.end]||p[F.n])+" "+(p[F.bai]||"")+" "+(p[F.cid]||"")));
+  var cats=String(p[F.cat]||"").split(",").filter(Boolean).map(function(c){return CAT[c]||c});
+  return '<a class="sm" href="#imoveis" style="color:var(--ac)">← Imóveis</a>'+
+  '<section class="panel" style="padding:0;overflow:hidden"><div class="cov" style="height:280px;'+covBg(p)+'"><small>'+esc(FASE[p[F.fase]]||"")+(v7?' · '+v7+' vendas na semana':'')+'</small><div><div style="font-size:34px">'+esc(p[F.n])+'</div><div style="font:500 13.5px var(--fb);opacity:.9">'+esc(p[F.inc])+' · '+esc(p[F.bai]||"")+(p[F.zona]?' · '+esc(ZONA[p[F.zona]]||""):"")+'</div></div></div>'+
+   '<div style="padding:16px;display:flex;flex-direction:column;gap:14px">'+(p[F.desc]?'<p style="margin:0;max-width:70ch">'+esc(p[F.desc])+'</p>':'')+
+   '<div class="g g4">'+kv("Tabela a partir de",brlc(p[F.pp]))+(p[F.pv]?kv("À vista a partir de",brlc(p[F.pv])):'')+kv("R$/m²",p[F.m2p]?"R$ "+p[F.m2p].toLocaleString("pt-BR"):"—")+kv("Metragens",p[F.m2a]?(p[F.m2a].toLocaleString("pt-BR")+(p[F.m2b]&&p[F.m2b]!==p[F.m2a]?" a "+p[F.m2b].toLocaleString("pt-BR"):"")+" m²"):"—")+kv("Entrega",entTxt(p))+kv("Tipologias",dorms(p).join(", ")||"—")+'</div>'+
+   '<div><div class="sm" style="display:flex;gap:14px;flex-wrap:wrap"><span class="pill st-disponivel">'+p[F.disp]+' disponíveis</span><span class="pill st-reservada">'+p[F.res]+' reservadas</span>'+(p[F.proc]?'<span class="pill st-processo_final">'+p[F.proc]+' em processo</span>':'')+'<span class="pill st-vendida">'+p[F.vend]+' vendidas</span><span class="mt">de '+p[F.tot]+' unidades · '+pc(p[F.vend],tot)+'% vendido</span></div><div class="prog" style="height:12px;margin-top:8px"><i style="width:'+pc(p[F.vend],tot)+'%;background:var(--bd)"></i><i style="width:'+pc(p[F.proc],tot)+'%;background:var(--in)"></i><i style="width:'+pc(p[F.res],tot)+'%;background:var(--wn)"></i><i style="width:'+pc(p[F.disp],tot)+'%;background:var(--ok)"></i></div></div>'+
+   '<div class="sm" style="display:flex;gap:8px 18px;flex-wrap:wrap"><span><span class="mt">Endereço:</span> '+esc(p[F.end]||"—")+(p[F.cid]&&p[F.cid]!=="São Paulo"?" · "+esc(p[F.cid]):"")+'</span>'+(p[F.tab]?'<span><span class="mt">Fonte:</span> '+esc(p[F.tab])+'</span>':'')+(cats.length?'<span><span class="mt">Enquadramento:</span> '+esc(cats.join(", "))+'</span>':'')+'<span class="mt">Espelho lido '+quando(new Date(p[F.upd]).getTime())+'</span></div>'+
+   '<div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn s" href="'+esc(maps)+'" target="_blank" rel="noopener">Ver no mapa ↗</a><button class="btn s p" data-a="share" data-id="'+esc(id)+'">Copiar texto para o cliente</button><button class="btn s" data-a="cmpthis" data-id="'+esc(id)+'">Comparar com outros</button></div></div></section>'+
+  '<div class="g g2"><section class="panel"><h2>Movimentações recentes</h2><div class="list" style="margin-top:6px">'+(ms.length?ms.slice(0,30).map(function(x){return '<div class="li"><span class="num" style="width:70px"><b>'+esc(x[1])+'</b></span><div class="grow"><span class="sm">'+(ST[x[2]]||x[2])+' → <span class="pill st-'+x[3]+'">'+(ST[x[3]]||x[3])+'</span></span><span class="sm mt" style="display:block">'+esc(x[7]||"")+(x[6]?" · "+m2(x[6]):"")+'</span></div><span class="num sm">'+(x[5]?brl(x[5]):"")+'</span><span class="sm mt" style="width:92px;text-align:right">'+quando(x[4]*1000)+'</span></div>'}).join(""):'<div class="empty">Nenhuma movimentação desde que o robô começou a ler este espelho.</div>')+'</div></section>'+
+  '<section class="panel"><h2>Perto daqui</h2><div class="sm mt">Mesmo bairro ou até 2 km, com unidade livre</div><div class="list" style="margin-top:6px">'+(near.length?near.map(function(x){return liP(x[0],'<span class="num sm">'+brlc(x[0][F.pv]||x[0][F.pp])+'</span>')}).join(""):'<div class="empty">Nenhum outro projeto com unidade livre por perto.</div>')+'</div></section></div>';
+};
+function shareTxt(p){return "*"+p[F.n]+"*\n"+(p[F.desc]?p[F.desc]+"\n":"")+"📍 "+(p[F.end]||p[F.bai])+(p[F.bai]?" · "+p[F.bai]:"")+"\n🗓 "+(p[F.fase]==="pronto"?"Pronto para morar":"Entrega: "+entTxt(p))+"\n📐 "+dorms(p).join(", ")+(p[F.m2a]?" · "+m2(p[F.m2a])+(p[F.m2b]&&p[F.m2b]!==p[F.m2a]?" a "+m2(p[F.m2b]):""):"")+"\n💰 A partir de "+brl(p[F.pv]||p[F.pp])+"\n✅ "+p[F.disp]+" unidades disponíveis\n\nJEAN | Investimentos Imobiliários"}
+
+/* ---------- Pregão ---------- */
+R.pregao=function(){
+  var t0=sod(),hoje=D.m.filter(function(x){return x[4]*1000>=t0&&P(x[0])&&x[3]!=="novo"}),c=function(s){return hoje.filter(function(x){return x[3]===s})},vd=c("vendida"),vg=vd.reduce(function(a,x){return a+(x[5]||0)},0);
+  var maior=vd.filter(function(x){return x[5]}).sort(function(a,b){return b[5]-a[5]})[0],mp=maior&&P(maior[0]);
+  var dias=[];for(var i=6;i>=0;i--){var d0=sod(Date.now()-i*DAY);dias.push({t:d0,n:D.m.filter(function(x){return x[3]==="vendida"&&x[4]*1000>=d0&&x[4]*1000<d0+DAY}).length})}var mx=Math.max.apply(null,dias.map(function(d){return d.n}).concat([1])),t7=dias.reduce(function(a,d){return a+d.n},0);
+  var a={},t=Date.now()-7*DAY;D.m.forEach(function(x){if(x[4]*1000<t||!P(x[0]))return;a[x[0]]=a[x[0]]||{v:0,r:0};if(x[3]==="vendida")a[x[0]].v++;else if(x[3]==="reservada")a[x[0]].r++});var rk=Object.keys(a).filter(function(k){return a[k].v||a[k].r}).sort(function(x,y){return a[y].v-a[x].v||a[y].r-a[x].r}).slice(0,10);
+  var fl=UI.pf||"",lst=hoje.filter(function(x){return !fl||x[3]===fl});
+  return '<div class="top"><div><h1>Pregão</h1><div class="sm mt" style="margin-top:4px">Tudo o que mudou hoje nos espelhos</div></div><span class="live">Atualizado '+quando(D.em)+'</span></div>'+
+  '<div class="g g2"><section class="panel"><div class="eyebrow">Vendido hoje</div><div class="big num" style="margin:8px 0 12px">'+brlc(vg)+'</div><div class="g g4">'+kv("Vendas",vd.length)+kv("Reservas",c("reservada").length)+kv("Voltaram",c("disponivel").length)+'</div><p class="sm mt" style="margin:10px 0 0">VGV pelo preço de tabela.</p></section>'+
+   (mp?'<section class="panel clk" data-p="'+esc(mp[F.id])+'" style="padding:0;overflow:hidden"><div class="cov" style="height:100%;min-height:200px;'+covBg(mp)+'"><small>Maior venda de hoje · '+hm(maior[4]*1000)+'</small><div><div style="font-size:26px">'+esc(mp[F.n])+' '+esc(maior[1])+'</div><div style="font:500 13px var(--fb);opacity:.9">'+(maior[6]?m2(maior[6])+" · ":"")+esc(mp[F.inc])+'</div><div style="font-size:24px;margin-top:4px">'+brl(maior[5])+'</div></div></div></section>':'<section class="panel"><p class="mt">Nenhuma venda registrada hoje ainda.</p></section>')+'</div>'+
+  '<div class="g g2"><section class="panel"><div style="display:flex;justify-content:space-between"><h2>Vendas por dia</h2><span class="sm mt">'+t7+' em 7 dias</span></div><div class="bars" style="margin-top:12px">'+dias.map(function(d,i){return '<div class="'+(i===6?"hj":"")+'"><b>'+d.n+'</b><i style="height:'+(d.n/mx*100)+'%"></i>'+(i===6?"hoje":new Date(d.t).toLocaleDateString("pt-BR",{weekday:"short"}).replace(".",""))+'</div>'}).join("")+'</div></section>'+
+   '<section class="panel ox"><div style="display:flex;justify-content:space-between"><h2>Ranking da semana</h2><span class="sm mt">7 dias</span></div><table style="margin-top:6px"><thead><tr><th>#</th><th>Projeto</th><th class="r">Vendas</th><th class="r">Reservas</th></tr></thead><tbody>'+(rk.length?rk.map(function(id,i){var p=P(id);return '<tr class="clk" data-p="'+esc(id)+'"><td class="num mt">'+(i+1)+'</td><td><b>'+esc(p[F.n])+'</b><div class="sm mt">'+esc(p[F.inc])+' · '+esc(p[F.bai]||"")+'</div></td><td class="r num"><b>'+a[id].v+'</b></td><td class="r num mt">'+a[id].r+'</td></tr>'}).join(""):'<tr><td colspan="4" class="mt">Sem movimentações na semana ainda.</td></tr>')+'</tbody></table></section></div>'+
+  '<section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2>Movimentações de hoje · '+hoje.length+'</h2><div class="seg">'+[["","Todas"],["vendida","Vendas"],["reservada","Reservas"],["disponivel","Voltaram"]].map(function(x){return '<button data-pf="'+x[0]+'" class="'+(fl===x[0]?"on":"")+'">'+x[1]+'</button>'}).join("")+'</div></div><div class="list" style="margin-top:6px">'+
+   (lst.length?lst.slice(0,200).map(function(x){var p=P(x[0]);return '<div class="li clk" data-p="'+esc(x[0])+'"><span class="num mt sm" style="width:42px">'+hm(x[4]*1000)+'</span><div class="grow"><b>'+esc(p[F.n])+' · '+esc(x[1])+'</b><span class="sm mt">'+esc(x[7]||"")+(x[6]?" · "+m2(x[6]):"")+' · '+esc(p[F.bai]||"")+'</span></div><span class="pill st-'+x[3]+'">'+(ST[x[3]]||x[3])+'</span><span class="num sm" style="width:90px;text-align:right">'+(x[5]?brlc(x[5]):"")+'</span></div>'}).join(""):'<div class="empty">Nada por aqui hoje.</div>')+'</div></section>';
+};
+
+/* ---------- Tabelas ---------- */
+R.tabelas=function(){
+  var q=UI.tq.toLowerCase(),a=vendas7();
+  var l=D.p.filter(function(p){return !q||(p[F.n]+" "+p[F.inc]+" "+p[F.bai]).toLowerCase().indexOf(q)>=0}).sort(function(x,y){return (a[y[F.id]]||0)-(a[x[F.id]]||0)||y[F.disp]-x[F.disp]});
+  return '<div class="top"><div><h1>Tabelas</h1><div class="sm mt" style="margin-top:4px">Escolha o projeto para ver preços, situação das unidades e movimentações</div></div></div>'+
+  '<form class="search" id="ts" role="search"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="tsq" placeholder="Nome do projeto, construtora ou bairro" value="'+esc(UI.tq)+'" autocomplete="off"></form>'+
+  '<div class="sm mt">'+l.length+' projetos</div><div class="g g2">'+l.map(function(p){return '<div class="panel clk" data-p="'+esc(p[F.id])+'" style="padding:10px 12px"><div class="li" style="border:0;padding:0"><div class="mini" style="'+covBg(p)+'">'+iniOuFoto(p)+'</div><div class="grow"><b>'+esc(p[F.n])+'</b><span class="sm mt" style="display:block">'+esc(p[F.inc])+' · '+esc(p[F.bai]||"")+'</span><span class="sm mt">'+p[F.vend]+' vendidas de '+p[F.tot]+'</span></div><div style="text-align:right"><b class="num" style="color:var(--ac)">'+brlc(p[F.pv]||p[F.pp])+'</b><div class="sm mt">'+p[F.disp]+' livres</div></div></div></div>'}).join("")+'</div>';
+};
+A.tabelas=function(){$("#ts").onsubmit=function(e){e.preventDefault()};var q=$("#tsq");q.oninput=function(){UI.tq=q.value;render2();var z=$("#tsq");z.focus();z.setSelectionRange(z.value.length,z.value.length)}};
+
+/* ---------- Comparar ---------- */
+var MOT=[["parecidos","Parecidos"],["barato","Mais barato"],["entrega","Entrega mais próxima"],["regiao","Outra região"],["maior","Planta maior"]];
+function opcoes(b,mot,modo,km){
+  var pb=preco(b,modo),ds=String(b[F.dorm]||"");
+  var c=D.p.filter(function(p){return p!==b&&p[F.disp]>0&&preco(p,modo)}).map(function(p){return{p:p,d:perto(b,p),pr:preco(p,modo)}});
+  var pt=function(x){return km===0||(x.d!=null&&x.d<=km)},dormOk=function(x){var d=String(x.p[F.dorm]||"");return !ds||ds.split("").some(function(ch){return d.indexOf(ch)>=0})};
+  var r;
+  if(mot==="barato")r=c.filter(function(x){return pt(x)&&pb&&x.pr<pb&&dormOk(x)}).sort(function(a,b2){return a.pr-b2.pr});
+  else if(mot==="entrega")r=c.filter(function(x){return pt(x)&&dormOk(x)&&(FORD[x.p[F.fase]]<FORD[b[F.fase]]||(x.p[F.ent]&&b[F.ent]&&x.p[F.ent]<b[F.ent]))}).sort(function(a,b2){return (FORD[a.p[F.fase]]-FORD[b2.p[F.fase]])||String(a.p[F.ent]||"0").localeCompare(String(b2.p[F.ent]||"0"))});
+  else if(mot==="regiao")r=c.filter(function(x){return x.p[F.zona]!==b[F.zona]&&dormOk(x)&&(!pb||Math.abs(x.pr-pb)/pb<=.2)}).sort(function(a,b2){return Math.abs(a.pr-pb)-Math.abs(b2.pr-pb)});
+  else if(mot==="maior")r=c.filter(function(x){return pt(x)&&(x.p[F.m2b]||0)>(b[F.m2b]||0)&&(!pb||x.pr<=pb*1.25)}).sort(function(a,b2){return (b2.p[F.m2b]||0)-(a.p[F.m2b]||0)});
+  else r=c.filter(function(x){return pt(x)&&dormOk(x)&&(!pb||Math.abs(x.pr-pb)/pb<=.25)}).sort(function(a,b2){return (pb?Math.abs(a.pr-pb)/pb:0)+(a.d||0)/10-((pb?Math.abs(b2.pr-pb)/pb:0)+(b2.d||0)/10)});
+  return r.slice(0,4);
+}
+R.comparar=function(){
+  var c=UI.cmp,b=c.id&&P(c.id),ops=b?opcoes(b,c.mot,c.modo,c.km):[];
+  var opts=D.p.slice().sort(function(a,b2){return a[F.n].localeCompare(b2[F.n])});
+  var col=function(x,base){var p=x.p||x,pr=preco(p,c.modo),pb=b&&preco(b,c.modo),df=!base&&pb&&pr?pr-pb:null;return '<div class="panel'+(base?" base":"")+'"><div class="cov" style="height:100px;'+covBg(p)+';font-size:22px"><small>'+(base?"O que o cliente viu":ZONA[p[F.zona]]||esc(p[F.bai]||""))+'</small>'+iniOuFoto(p)+'</div><b class="clk" data-p="'+esc(p[F.id])+'" style="font-size:15px">'+esc(p[F.n])+'</b><span class="sm mt">'+esc(p[F.inc])+' · '+esc(p[F.bai]||"")+'</span>'+
+   '<div class="num" style="font-size:19px;color:var(--ac)">'+brlc(pr)+'</div>'+(df!=null?'<span class="sm" style="color:'+(df<0?"var(--ok)":df>0?"var(--bd)":"inherit")+'">'+(df<0?"−":"+")+brlc(Math.abs(df))+' que o visto</span>':'<span class="sm mt">tabela</span>')+
+   '<div class="sm"><span class="mt">Tipologias:</span> '+(dorms(p).join(", ")||"—")+'</div><div class="sm"><span class="mt">Metragem:</span> '+(p[F.m2a]?p[F.m2a].toLocaleString("pt-BR")+(p[F.m2b]&&p[F.m2b]!==p[F.m2a]?" a "+p[F.m2b].toLocaleString("pt-BR"):"")+" m²":"—")+'</div><div class="sm"><span class="mt">Entrega:</span> '+entTxt(p)+'</div><div class="sm"><span class="mt">R$/m²:</span> '+(p[F.m2p]?"R$ "+p[F.m2p].toLocaleString("pt-BR"):"—")+'</div><div class="sm"><span class="mt">Livres:</span> '+p[F.disp]+'</div></div>'};
+  return '<div class="top"><div><h1>Comparar</h1><div class="sm mt" style="margin-top:4px;max-width:62ch">O cliente não gostou de um projeto? Escolha o projeto e o motivo: o app separa até 4 opções parecidas e mostra lado a lado.</div></div></div>'+
+  '<section class="panel" style="display:flex;flex-direction:column;gap:12px"><div><label class="eyebrow" for="cpp">Projeto que o cliente viu</label><select class="fld" id="cpp" style="width:100%;margin-top:6px"><option value="">Escolher o projeto…</option>'+opts.map(function(p){return '<option value="'+esc(p[F.id])+'"'+(p[F.id]===c.id?" selected":"")+'>'+esc(p[F.n])+' · '+esc(p[F.bai]||"")+'</option>'}).join("")+'</select></div>'+
+   '<div><div class="eyebrow">Por que ele não gostou?</div><div class="chips" style="margin-top:6px">'+MOT.map(function(m){return '<button class="chip'+(c.mot===m[0]?" on":"")+'" data-mot="'+m[0]+'">'+m[1]+'</button>'}).join("")+'</div></div>'+
+   '<div><label class="eyebrow" for="ckm">Distância</label><select class="fld" id="ckm" style="display:block;margin-top:6px">'+[[1,"mesmo bairro"],[5,"mesma região"],[0,"qualquer lugar"]].map(function(k){return '<option value="'+k[0]+'"'+(c.km===k[0]?" selected":"")+'>'+k[1]+'</option>'}).join("")+'</select></div></section>'+
+  (b?(ops.length?'<div class="ox"><div class="cmp" style="--n:'+(ops.length+1)+'">'+col(b,true)+ops.map(function(x){return col(x,false)}).join("")+'</div></div>':'<div class="panel empty">Nenhuma opção com esse motivo. Aumente a distância ou troque o motivo.</div>'):'<div class="panel empty">Escolha o projeto que o cliente viu para ver as opções.</div>');
+};
+A.comparar=function(){var c=UI.cmp;$("#cpp").onchange=function(e){c.id=e.target.value;render2()};$("#ckm").onchange=function(e){c.km=+e.target.value;render2()}};
+
+/* ---------- Mercado ---------- */
+R.mercado=function(){
+  var per=+UI.mper,t=Date.now()-per*DAY,inc={},zn={};
+  D.p.forEach(function(p){var k=p[F.inc];inc[k]=inc[k]||{n:0,l:0,v:0,vg:0,r:0,tv:0,tt:0};inc[k].n++;inc[k].l+=p[F.disp]||0;inc[k].tv+=p[F.vend]||0;inc[k].tt+=p[F.tot]||0;var z=p[F.zona]||"-";zn[z]=zn[z]||{l:0,v:0,n:0};zn[z].l+=p[F.disp]||0;zn[z].n++});
+  D.m.forEach(function(x){if(x[4]*1000<t)return;var p=P(x[0]);if(!p)return;var k=p[F.inc],z=p[F.zona]||"-";if(x[3]==="vendida"){inc[k].v++;inc[k].vg+=x[5]||0;zn[z].v++}else if(x[3]==="reservada")inc[k].r++});
+  var ks=Object.keys(inc).sort(function(a,b){return inc[b].v-inc[a].v||inc[b].l-inc[a].l}),zk=Object.keys(zn).filter(function(z){return z!=="-"}).sort(function(a,b){return zn[b].v-zn[a].v||zn[b].l-zn[a].l}),zmx=Math.max.apply(null,zk.map(function(z){return zn[z].l}).concat([1]));
+  return '<div class="top"><div><h1>Mercado</h1><div class="sm mt" style="margin-top:4px">Vendas e estoque por incorporadora e região</div></div><div class="seg">'+[["1","Hoje"],["7","7 dias"],["30","30 dias"]].map(function(x){return '<button data-mper="'+x[0]+'" class="'+(UI.mper===x[0]?"on":"")+'">'+x[1]+'</button>'}).join("")+'</div></div>'+
+  '<section class="panel"><h2>Por região</h2><div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">'+zk.map(function(z){return '<div style="display:grid;grid-template-columns:110px 1fr 160px;gap:10px;align-items:center" class="sm"><span>'+esc(ZONA[z]||z)+'</span><div class="prog" style="height:14px;border-radius:5px"><i style="width:'+Math.max(1,zn[z].l/zmx*100)+'%;background:var(--ac)"></i></div><span class="num" style="text-align:right">'+zn[z].v+' vend. · '+zn[z].l.toLocaleString("pt-BR")+' livres</span></div>'}).join("")+'</div></section>'+
+  '<section class="panel ox"><h2>Por incorporadora</h2><table style="margin-top:6px"><thead><tr><th>Incorporadora</th><th class="r">Projetos</th><th class="r">Unid. livres</th><th class="r">% vendido</th><th class="r">Vendas</th><th class="r">Reservas</th><th class="r">VGV vendido</th></tr></thead><tbody>'+ks.map(function(k){var r=inc[k];return '<tr><td><b>'+esc(k)+'</b></td><td class="r num">'+r.n+'</td><td class="r num">'+r.l.toLocaleString("pt-BR")+'</td><td class="r num">'+pc(r.tv,r.tt)+'%</td><td class="r num"><b>'+r.v+'</b></td><td class="r num mt">'+r.r+'</td><td class="r num">'+brlc(r.vg)+'</td></tr>'}).join("")+'</tbody></table></section>';
+};
+
+/* ---------- Resumo do dia ---------- */
+function resumoTxt(){
+  var t0=sod(),h=D.m.filter(function(x){return x[4]*1000>=t0&&P(x[0])}),vd=h.filter(function(x){return x[3]==="vendida"}),vg=vd.reduce(function(a,x){return a+(x[5]||0)},0),rs=h.filter(function(x){return x[3]==="reservada"}).length,vt=h.filter(function(x){return x[3]==="disponivel"}).length;
+  var a={};vd.forEach(function(x){a[x[0]]=(a[x[0]]||0)+1});var top=Object.keys(a).sort(function(x,y){return a[y]-a[x]}).slice(0,5);
+  var mz=vd.filter(function(x){return x[5]}).sort(function(x,y){return y[5]-x[5]})[0];
+  var txt="📊 *Resumo dos espelhos · "+new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"})+"*\n\n✅ "+vd.length+" vendas · "+brlc(vg)+" em VGV\n📌 "+rs+" reservas\n↩️ "+vt+" unidades voltaram para venda\n";
+  if(top.length)txt+="\n🏆 *Quem mais vendeu hoje*\n"+top.map(function(id,i){return (i+1)+". "+P(id)[F.n]+" ("+P(id)[F.bai]+"): "+a[id]+" venda"+(a[id]>1?"s":"")}).join("\n")+"\n";
+  if(mz)txt+="\n💎 Maior venda: "+P(mz[0])[F.n]+" "+mz[1]+" · "+brl(mz[5])+"\n";
+  var lv=D.p.filter(function(p){return p[F.disp]>0}).length;txt+="\n🏢 "+lv+" projetos com unidade livre\n\nJEAN | Investimentos Imobiliários";return txt;
+}
+R.resumo=function(){return '<div class="top"><div><h1>Resumo do dia</h1><div class="sm mt" style="margin-top:4px">Pronto para mandar no grupo do time ou para clientes investidores</div></div><button class="btn p" data-a="copres">Copiar resumo</button></div><div class="panel"><div class="pre">'+esc(resumoTxt())+'</div></div>'};
+
+/* ---------- dados ---------- */
+function usar(j){D.p=j.p.filter(function(p){return Array.isArray(p)&&p[0]});D.m=(j.m||[]).slice().sort(function(a,b){return b[4]-a[4]});D.em=j.em;D.byId={};D.p.forEach(function(p){D.byId[p[0]]=p});D.ok=D.p.length>0;go()}
+async function pegar(u){try{var r=await fetch(u+"?t="+Date.now(),{cache:"no-store"});return r.ok?await r.json():null}catch(e){return null}}
+async function carregar(){
+  var a=await pegar("dados/espelho.json"),b=await pegar("dados/base.json");
+  if(!a&&!b){ST8="vazio";render();return}
+  var p=(a&&a.p)||[],m=(a&&a.m)||[],ids={};p.forEach(function(x){ids[x[0]]=1});
+  if(b&&b.p){b.p.forEach(function(x){if(!ids[x[0]])p.push(x)});m=m.concat(b.m||[])}
+  ST8="ok";usar({p:p,m:m,em:(a&&a.em)||(b&&b.em)||Date.now()});
+}
+
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-p],[data-a],[data-fk],[data-fmax],[data-rank],[data-pf],[data-mot],[data-mper]");if(!b)return;var d=b.dataset;
+  if(d.p){location.hash="p-"+d.p;return}
+  if(d.fk){var arr=UI.f[d.fk],i=arr.indexOf(d.fv);if(i>=0)arr.splice(i,1);else arr.push(d.fv);UI.lim=60;render2();return}
+  if(d.fmax){UI.f.max=+UI.f.max===+d.fmax?"":d.fmax;render2();return}
+  if(d.rank){UI.rank=d.rank;render2();return}
+  if(d.pf!==undefined){UI.pf=d.pf;render2();return}
+  if(d.mot){UI.cmp.mot=d.mot;render2();return}
+  if(d.mper){UI.mper=d.mper;render2();return}
+  var a=d.a;
+  if(a==="limpar"){UI.f={q:"",modo:"pp",min:"",max:"",dorm:[],zona:[],fase:[],inc:[],cat:[],vaga:"",ent:"",sort:"vend"};render2()}
+  else if(a==="mais"){UI.lim=(UI.lim||60)+60;render2()}
+  else if(a==="share"){copy(shareTxt(P(d.id)))}
+  else if(a==="cmpthis"){UI.cmp.id=d.id;location.hash="comparar"}
+  else if(a==="copres"){copy(resumoTxt())}
+  else if(a==="tema"){var r=document.documentElement,dk=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;r.dataset.theme=dk?"light":"dark";try{localStorage.setItem("esp-jean-tema",r.dataset.theme)}catch(x){}}
+});
+document.addEventListener("keydown",function(e){if(e.key==="Enter"){var c=e.target.closest&&e.target.closest(".card[data-p]");if(c)location.hash="p-"+c.dataset.p}});
+try{var th=localStorage.getItem("esp-jean-tema");if(th)document.documentElement.dataset.theme=th}catch(e){}
+window.addEventListener("hashchange",go);
+render();carregar();setInterval(carregar,10*60*1000);
+</script>
+</body>
+</html>

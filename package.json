@@ -1,0 +1,7 @@
+{
+  "name": "espelhos-jean",
+  "private": true,
+  "type": "module",
+  "scripts": { "robo": "node robo/orulo.mjs" },
+  "dependencies": { "playwright": "^1.48.0" }
+}
