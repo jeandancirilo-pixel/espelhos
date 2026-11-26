@@ -34,27 +34,45 @@ const numDe = ref => String(ref).replace(/^(HIS[12]?|HMP|R2V|NR[12]?)/i, "") || 
 const dormDe = u => /studio/i.test(u.type || "") ? "S" : /loja|sala|comercial/i.test(u.type || "") ? "L" : u.bedrooms ? String(Math.min(4, u.bedrooms)) : "";
 const tipoTxt = u => { const d = dormDe(u); return d === "S" ? "Studio" : d === "L" ? (u.type || "Loja") : d ? d + (d === "1" ? " dorm" : " dorms") : (u.type || ""); };
 
+const print = async (page, nome) => { try { await page.screenshot({ path: path.join(DEBUG, nome + ".png"), fullPage: true }); fs.writeFileSync(path.join(DEBUG, nome + ".txt"), page.url() + "\n\n" + (await page.evaluate(() => document.body.innerText)).slice(0, 5000)); } catch { } };
+
 async function entrar(page, sub) {
   const base = `https://${sub}.portal.orulo.com.br`;
-  await page.goto(base + "/empreendimentos", { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(2500);
+  await page.goto(base + "/login", { waitUntil: "networkidle" }).catch(() => { });
+  await page.waitForTimeout(2000);
+  console.log("  página de login:", page.url());
+  await print(page, `${sub}-1-login`);
   const pw = page.locator('input[type="password"]');
   if (!(await pw.count())) {
-    if (!/login|entrar/i.test(page.url())) return; // já está logado
-    await page.goto(base + "/login", { waitUntil: "domcontentloaded" });
+    // alguns portais pedem o e-mail primeiro e só depois a senha
+    const btnEntrar = page.locator('a:has-text("Entrar"), button:has-text("Entrar"), a:has-text("Login"), button:has-text("Login")').first();
+    if (await btnEntrar.count()) { await btnEntrar.click().catch(() => { }); await page.waitForTimeout(2500); }
+  }
+  const usr = page.locator('input[type="email"], input[name*="email" i], input[name*="login" i], input[name*="user" i], input[type="text"]').first();
+  if (!(await pw.count()) && (await usr.count())) {
+    await usr.fill(USUARIO);
+    const seguir = page.locator('button[type="submit"], button:has-text("Continuar"), button:has-text("Próximo"), button:has-text("Avançar")').first();
+    if (await seguir.count()) await seguir.click(); else await usr.press("Enter");
+    await page.waitForTimeout(2500);
   }
   await pw.first().waitFor({ timeout: 30000 });
-  const usr = page.locator('input[type="email"], input[name*="email" i], input[name*="login" i], input[name*="user" i], input[type="text"]').first();
-  await usr.fill(USUARIO);
+  if (await usr.count() && !(await usr.inputValue().catch(() => ""))) await usr.fill(USUARIO);
   await pw.first().fill(SENHA);
+  await print(page, `${sub}-2-preenchido`);
   const btn = page.locator('button[type="submit"], button:has-text("Entrar"), button:has-text("Acessar")').first();
   if (await btn.count()) await btn.click(); else await pw.first().press("Enter");
-  await page.waitForFunction(() => !document.querySelector('input[type="password"]'), null, { timeout: 45000 });
-  await page.waitForTimeout(2000);
+  await page.waitForFunction(() => !document.querySelector('input[type="password"]'), null, { timeout: 45000 }).catch(() => { });
+  await page.waitForTimeout(3000);
+  console.log("  depois do login:", page.url());
+  await print(page, `${sub}-3-depois-login`);
+  if (await page.locator('input[type="password"]').count()) throw new Error("o login não passou (confira usuário e senha nos secrets)");
 }
 
 async function listar(page, sub) {
   await page.goto(`https://${sub}.portal.orulo.com.br/empreendimentos`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(2000);
+  console.log("  lista:", page.url());
+  await print(page, `${sub}-4-lista`);
   return await page.$$eval('a[href*="/empreendimentos/"]', as => {
     const m = {};
     for (const a of as) {
