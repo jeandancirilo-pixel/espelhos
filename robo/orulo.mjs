@@ -154,6 +154,8 @@ function montar(sub, construtora, b, det, us) {
   p[18] = det.capa || null; p[19] = det.desc || null; p[20] = "Tabela Digital " + construtora + " (Órulo)"; p[21] = null; p[22] = null;
   p[23] = null; p[24] = null; p[25] = null; p[26] = new Date().toISOString(); p[27] = partes[0] || null; p[28] = cidade;
   p[29] = null; p[30] = barata && barata.private_area ? Math.round(barata.price / barata.private_area) : null; p[31] = cats || null; p[32] = null; p[33] = null;
+  // unidades livres, da mais barata para a mais cara: [unidade, tipologia, área, andar, preço]
+  p[34] = livres.slice().sort((a, b2) => a.price - b2.price).map(u => [numDe(u.reference), tipoTxt(u), u.private_area || null, u.floor ?? null, Math.round(u.price)]);
   return p;
 }
 

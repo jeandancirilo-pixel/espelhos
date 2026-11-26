@@ -109,6 +109,15 @@ td.r,th.r{text-align:right}
 .cmp .panel.base{border-color:var(--ac)}
 .empty{color:var(--mt);padding:16px 4px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:9px 16px;border-radius:10px;font-weight:600;z-index:60;font-size:13px}
+dialog{background:var(--sf);color:var(--tx);border:1px solid var(--ln);border-radius:16px;width:min(620px,96vw);padding:0;max-height:92vh}
+dialog::backdrop{background:#000a}
+.fh{position:sticky;top:0;background:var(--sf);padding:16px 20px 10px;border-bottom:1px solid var(--ln);display:flex;justify-content:space-between;gap:10px;align-items:flex-start;z-index:2}
+.fb{padding:14px 20px;display:flex;flex-direction:column;gap:14px}
+.ff{position:sticky;bottom:0;background:var(--sf);padding:12px 20px;border-top:1px solid var(--ln);display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.un{display:flex;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--ln);border-radius:10px;cursor:pointer}
+.un:has(input:checked){border-color:var(--ac);background:var(--acs)}
+.un input{width:18px;height:18px;accent-color:var(--ac)}
+.uns{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow:auto;padding-right:4px}
 .pre{white-space:pre-wrap;background:var(--sf2);border-radius:12px;padding:14px;font-size:13.5px;line-height:1.55}
 @media(max-width:820px){
   .app{flex-direction:column}
@@ -124,6 +133,7 @@ td.r,th.r{text-align:right}
   <nav class="rail" id="rail" aria-label="Seções"></nav>
   <main><div class="wrap" id="view"></div></main>
 </div>
+<dialog id="dlg"><div id="dbody"></div></dialog>
 <script>
 "use strict";
 /* Os dados vêm de dados/espelho.enc.json, gravado pelo robô (robo/orulo.mjs) de hora em hora.
@@ -271,11 +281,47 @@ R.projeto=function(id){
    '<div class="g g4">'+kv("Tabela a partir de",brlc(p[F.pp]))+(p[F.pv]?kv("À vista a partir de",brlc(p[F.pv])):'')+kv("R$/m²",p[F.m2p]?"R$ "+p[F.m2p].toLocaleString("pt-BR"):"—")+kv("Metragens",p[F.m2a]?(p[F.m2a].toLocaleString("pt-BR")+(p[F.m2b]&&p[F.m2b]!==p[F.m2a]?" a "+p[F.m2b].toLocaleString("pt-BR"):"")+" m²"):"—")+kv("Entrega",entTxt(p))+kv("Tipologias",dorms(p).join(", ")||"—")+'</div>'+
    '<div><div class="sm" style="display:flex;gap:14px;flex-wrap:wrap"><span class="pill st-disponivel">'+p[F.disp]+' disponíveis</span><span class="pill st-reservada">'+p[F.res]+' reservadas</span>'+(p[F.proc]?'<span class="pill st-processo_final">'+p[F.proc]+' em processo</span>':'')+'<span class="pill st-vendida">'+p[F.vend]+' vendidas</span><span class="mt">de '+p[F.tot]+' unidades · '+pc(p[F.vend],tot)+'% vendido</span></div><div class="prog" style="height:12px;margin-top:8px"><i style="width:'+pc(p[F.vend],tot)+'%;background:var(--bd)"></i><i style="width:'+pc(p[F.proc],tot)+'%;background:var(--in)"></i><i style="width:'+pc(p[F.res],tot)+'%;background:var(--wn)"></i><i style="width:'+pc(p[F.disp],tot)+'%;background:var(--ok)"></i></div></div>'+
    '<div class="sm" style="display:flex;gap:8px 18px;flex-wrap:wrap"><span><span class="mt">Endereço:</span> '+esc(p[F.end]||"—")+(p[F.cid]&&p[F.cid]!=="São Paulo"?" · "+esc(p[F.cid]):"")+'</span>'+(p[F.tab]?'<span><span class="mt">Fonte:</span> '+esc(p[F.tab])+'</span>':'')+(cats.length?'<span><span class="mt">Enquadramento:</span> '+esc(cats.join(", "))+'</span>':'')+'<span class="mt">Espelho lido '+quando(new Date(p[F.upd]).getTime())+'</span></div>'+
-   '<div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn s" href="'+esc(maps)+'" target="_blank" rel="noopener">Ver no mapa ↗</a><button class="btn s p" data-a="share" data-id="'+esc(id)+'">Copiar texto para o cliente</button><button class="btn s" data-a="cmpthis" data-id="'+esc(id)+'">Comparar com outros</button></div></div></section>'+
+   '<div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn s" href="'+esc(maps)+'" target="_blank" rel="noopener">Ver no mapa ↗</a><button class="btn s p" data-a="mandar" data-id="'+esc(id)+'">Mandar pro cliente</button><button class="btn s" data-a="share" data-id="'+esc(id)+'">Copiar texto</button><button class="btn s" data-a="cmpthis" data-id="'+esc(id)+'">Comparar com outros</button></div></div></section>'+
   '<div class="g g2"><section class="panel"><h2>Movimentações recentes</h2><div class="list" style="margin-top:6px">'+(ms.length?ms.slice(0,30).map(function(x){return '<div class="li"><span class="num" style="width:70px"><b>'+esc(x[1])+'</b></span><div class="grow"><span class="sm">'+(ST[x[2]]||x[2])+' → <span class="pill st-'+x[3]+'">'+(ST[x[3]]||x[3])+'</span></span><span class="sm mt" style="display:block">'+esc(x[7]||"")+(x[6]?" · "+m2(x[6]):"")+'</span></div><span class="num sm">'+(x[5]?brl(x[5]):"")+'</span><span class="sm mt" style="width:92px;text-align:right">'+quando(x[4]*1000)+'</span></div>'}).join(""):'<div class="empty">Nenhuma movimentação desde que o robô começou a ler este espelho.</div>')+'</div></section>'+
   '<section class="panel"><h2>Perto daqui</h2><div class="sm mt">Mesmo bairro ou até 2 km, com unidade livre</div><div class="list" style="margin-top:6px">'+(near.length?near.map(function(x){return liP(x[0],'<span class="num sm">'+brlc(x[0][F.pv]||x[0][F.pp])+'</span>')}).join(""):'<div class="empty">Nenhum outro projeto com unidade livre por perto.</div>')+'</div></section></div>';
 };
 function shareTxt(p){return "*"+p[F.n]+"*\n"+(p[F.desc]?p[F.desc]+"\n":"")+"📍 "+(p[F.end]||p[F.bai])+(p[F.bai]?" · "+p[F.bai]:"")+"\n🗓 "+(p[F.fase]==="pronto"?"Pronto para morar":"Entrega: "+entTxt(p))+"\n📐 "+dorms(p).join(", ")+(p[F.m2a]?" · "+m2(p[F.m2a])+(p[F.m2b]&&p[F.m2b]!==p[F.m2a]?" a "+m2(p[F.m2b]):""):"")+"\n💰 A partir de "+brl(p[F.pv]||p[F.pp])+"\n✅ "+p[F.disp]+" unidades disponíveis\n\nJEAN | Investimentos Imobiliários"}
+
+/* ---------- Mandar pro cliente ---------- */
+// Gera um link para a página cliente.html com os dados das unidades marcadas dentro do próprio link
+// (o cliente não precisa de serial e só vê o que você escolheu).
+var ASS="esp-jean-assinatura";
+function andarTxt(a){return a==null?"":a===0?"térreo":a+"º andar"}
+function b64url(str){var b=new TextEncoder().encode(str),s="";for(var i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+function mandarDlg(id){
+  var p=P(id),us=p[34]||[],a={};try{a=JSON.parse(localStorage.getItem(ASS)||"{}")}catch(e){}
+  var html='<form id="mf"><div class="fh"><div><h2 style="font-size:20px">Mandar pro cliente</h2><div class="sm mt">'+esc(p[F.n])+' · o cliente recebe um link com fotos e os valores das unidades marcadas.</div></div><button type="button" class="btn s" id="mx" aria-label="Fechar">✕</button></div><div class="fb">'+
+   '<div><label class="eyebrow" for="mcn">Nome do cliente</label><input class="fld" id="mcn" style="width:100%;margin-top:6px" placeholder="Ex.: Mariana"></div>'+
+   '<div><div style="display:flex;justify-content:space-between;align-items:baseline"><span class="eyebrow">Unidades ('+us.length+' livres)</span><span class="sm mt" id="mcont">0 marcadas · até 40</span></div>'+
+   (us.length?'<div class="chips" style="margin:8px 0">'+[["barata","As 3 mais baratas"],["tipo","Uma de cada tipologia"],["nada","Desmarcar"]].map(function(x){return '<button type="button" class="chip" data-sel="'+x[0]+'">'+x[1]+'</button>'}).join("")+'</div><div class="uns">'+us.map(function(u,i){return '<label class="un"><input type="checkbox" value="'+i+'"><span style="flex:1;min-width:0"><b class="num">'+esc(u[0])+'</b><span class="sm mt" style="display:block">'+esc([u[1],u[2]?m2(u[2]):"",andarTxt(u[3])].filter(Boolean).join(", "))+'</span></span><b class="num">'+brlc(u[4])+'</b></label>'}).join("")+'</div>':'<p class="empty">Este projeto está sem unidades livres no momento.</p>')+'</div>'+
+   '<div><div class="eyebrow">Sua assinatura</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px"><input class="fld" id="man" placeholder="Seu nome" value="'+esc(a.n||"Jean Cirilo")+'"><input class="fld" id="maw" inputmode="tel" placeholder="Seu WhatsApp com DDD" value="'+esc(a.w||"")+'"></div></div>'+
+   '<p class="sm" id="mmsg" style="margin:0;color:var(--bd)"></p></div>'+
+   '<div class="ff"><span class="sm mt">Valores de tabela, como estão no espelho agora.</span><button class="btn p" id="mok">Criar o link</button></div></form>';
+  $("#dbody").innerHTML=html;var d=$("#dlg");d.showModal();
+  var cks=function(){return Array.prototype.slice.call(d.querySelectorAll(".uns input"))},conta=function(){var n=cks().filter(function(c){return c.checked}).length;$("#mcont").textContent=n+" marcada"+(n===1?"":"s")+" · até 40"};
+  $("#mx").onclick=function(){d.close()};
+  d.querySelectorAll(".uns input").forEach(function(c){c.onchange=function(){if(cks().filter(function(x){return x.checked}).length>40){c.checked=false;toast("Até 40 unidades por link")}conta()}});
+  d.querySelectorAll("[data-sel]").forEach(function(b){b.onclick=function(){var t=b.dataset.sel,c=cks();c.forEach(function(x){x.checked=false});if(t==="barata")c.slice(0,3).forEach(function(x){x.checked=true});else if(t==="tipo"){var vis={};c.forEach(function(x){var u=us[+x.value];if(!vis[u[1]]){vis[u[1]]=1;x.checked=true}})}conta()}});
+  $("#mf").onsubmit=function(e){e.preventDefault();
+    var sel=cks().filter(function(c){return c.checked}).map(function(c){return us[+c.value]}),nome=$("#man").value.trim(),wa=$("#maw").value.replace(/\D/g,"");
+    if(!sel.length){$("#mmsg").textContent="Marque pelo menos uma unidade.";return}
+    if(!nome||wa.length<10){$("#mmsg").textContent="Coloque seu nome e seu WhatsApp com DDD, para o cliente falar com você.";return}
+    try{localStorage.setItem(ASS,JSON.stringify({n:nome,w:wa}))}catch(x){}
+    var cli=$("#mcn").value.trim();
+    var dados={v:1,em:D.em,c:cli,p:{n:p[F.n],inc:p[F.inc],bai:p[F.bai],cid:p[F.cid],end:p[F.end],ent:entTxt(p),fase:FASE[p[F.fase]]||"",desc:p[F.desc]||"",capa:foto(p),cat:String(p[F.cat]||"")},u:sel,a:{n:nome,w:wa}};
+    var link=location.origin+location.pathname.replace(/index\.html$/,"").replace(/\/?$/,"/")+"cliente.html#"+b64url(JSON.stringify(dados));
+    var msg=(cli?"Olá, "+cli.split(" ")[0]+"! ":"Olá! ")+"Separei "+(sel.length>1?sel.length+" unidades":"uma unidade")+" do "+p[F.n]+" para você ver, com fotos e valores:\n"+link;
+    try{var en=JSON.parse(localStorage.getItem("esp-jean-enviadas")||"[]");en.unshift({em:Date.now(),c:cli,p:p[F.n],id:p[F.id],u:sel.map(function(u){return u[0]}),l:link});localStorage.setItem("esp-jean-enviadas",JSON.stringify(en.slice(0,200)))}catch(x){}
+    $("#dbody").innerHTML='<div class="fh"><div><h2 style="font-size:20px">Link pronto</h2><div class="sm mt">'+esc(p[F.n])+' · '+sel.length+' unidade'+(sel.length>1?"s":"")+(cli?' para '+esc(cli):'')+'</div></div><button type="button" class="btn s" id="mx2">✕</button></div><div class="fb"><div class="pre" style="word-break:break-all">'+esc(msg)+'</div>'+
+     '<div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn p" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(msg)+'">Enviar no WhatsApp</a><button type="button" class="btn" id="mcp">Copiar mensagem</button><button type="button" class="btn" id="mcl">Copiar só o link</button><a class="btn" target="_blank" rel="noopener" href="'+esc(link)+'">Ver como o cliente vê ↗</a></div></div>';
+    $("#mx2").onclick=function(){d.close()};$("#mcp").onclick=function(){copy(msg)};$("#mcl").onclick=function(){copy(link)};
+  };
+}
 
 /* ---------- Pregão ---------- */
 R.pregao=function(){
@@ -412,6 +458,7 @@ document.addEventListener("click",function(e){
   if(a==="limpar"){UI.f={q:"",modo:"pp",min:"",max:"",dorm:[],zona:[],fase:[],inc:[],cat:[],vaga:"",ent:"",sort:"vend"};render2()}
   else if(a==="mais"){UI.lim=(UI.lim||60)+60;render2()}
   else if(a==="share"){copy(shareTxt(P(d.id)))}
+  else if(a==="mandar"){mandarDlg(d.id)}
   else if(a==="cmpthis"){UI.cmp.id=d.id;location.hash="comparar"}
   else if(a==="copres"){copy(resumoTxt())}
   else if(a==="sair"){sair()}
