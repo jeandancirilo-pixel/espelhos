@@ -126,8 +126,8 @@ td.r,th.r{text-align:right}
 </div>
 <script>
 "use strict";
-/* Os dados vêm de dados/espelho.json, gravado pelo robô (robo/orulo.mjs) de hora em hora.
-   Se existir dados/base.json (mesmo formato), ele é somado: os projetos do robô têm prioridade. */
+/* Os dados vêm de dados/espelho.enc.json, gravado pelo robô (robo/orulo.mjs) de hora em hora.
+   O arquivo é cifrado: só abre com um serial válido (secret SERIAIS do repositório). */
 var F={id:0,n:1,iid:2,inc:3,bai:4,zona:5,fase:6,ent:7,disp:8,res:9,proc:10,vend:11,tot:12,pp:13,pv:14,dorm:15,m2a:16,m2b:17,capa:18,desc:19,tab:20,tabEm:21,stt:22,lat:23,lng:24,ap:25,upd:26,end:27,cid:28,vaga:29,m2p:30,cat:31};
 var FASE={lanc:"Lançamento",breve:"Breve lançamento",obras:"Em obras",pronto:"Pronto"},FORD={pronto:0,obras:1,lanc:2,breve:3};
 var ZONA={centro:"Centro",sul:"Zona Sul",oeste:"Zona Oeste",leste:"Zona Leste",norte:"Zona Norte",gsp:"Grande SP"};
@@ -176,10 +176,10 @@ var NAV=[["inicio","Início"],["imoveis","Imóveis"],["pregao","Pregão"],["tabe
 var cur="inicio",R={},A={};
 function rail(){
   var v=cur.indexOf("p-")===0?"tabelas":cur;
-  $("#rail").innerHTML='<div class="brand"><div class="lg">J</div><div><b>Espelhos</b><small>JEAN Investimentos</small></div></div>'+NAV.map(function(n){return '<a href="#'+n[0]+'" class="'+(v===n[0]?"on":"")+'"><svg viewBox="0 0 24 24">'+ICO[n[0]]+'</svg>'+n[1]+'</a>'}).join("")+'<div class="sp"></div><div class="foot" style="padding:8px 10px;display:flex;flex-direction:column;gap:8px">'+(D.ok?'<span class="live">Atualizado '+quando(D.em)+'</span><span class="sm mt">O robô lê os portais de hora em hora</span>':'')+'<button class="btn s" data-a="tema">Tema claro/escuro</button></div>';
+  $("#rail").innerHTML='<div class="brand"><div class="lg">J</div><div><b>Espelhos</b><small>JEAN Investimentos</small></div></div>'+NAV.map(function(n){return '<a href="#'+n[0]+'" class="'+(v===n[0]?"on":"")+'"><svg viewBox="0 0 24 24">'+ICO[n[0]]+'</svg>'+n[1]+'</a>'}).join("")+'<div class="sp"></div><div class="foot" style="padding:8px 10px;display:flex;flex-direction:column;gap:8px">'+(D.ok?'<span class="live">Atualizado '+quando(D.em)+'</span><span class="sm mt">O robô lê os portais de hora em hora</span>':'')+'<button class="btn s" data-a="tema">Tema claro/escuro</button><button class="btn s" data-a="sair">Sair</button></div>';
 }
 function go(){var h=(location.hash||"").slice(1);cur=h&&(R[h]||(h.indexOf("p-")===0&&P(h.slice(2))))?h:"inicio";render();window.scrollTo(0,0)}
-function render(){rail();var v=$("#view");if(!D.ok){v.innerHTML=vazio();return}var k=cur.indexOf("p-")===0?"projeto":cur,f=k==="projeto"?function(){return R.projeto(cur.slice(2))}:R[cur];v.innerHTML=f();if(A[k])A[k]()}
+function render(){var v=$("#view");if(!D.ok&&ST8==="login"){$("#rail").style.display="none";v.innerHTML=telaLogin(MSG);ligarLogin();return}$("#rail").style.display="";rail();if(!D.ok){v.innerHTML=vazio();return}var k=cur.indexOf("p-")===0?"projeto":cur,f=k==="projeto"?function(){return R.projeto(cur.slice(2))}:R[cur];v.innerHTML=f();if(A[k])A[k]()}
 function render2(){var y=window.scrollY;render();window.scrollTo(0,y)}
 function vazio(){
   if(ST8==="carregando")return '<div class="panel"><p class="mt">Carregando os espelhos…</p></div>';
@@ -354,15 +354,49 @@ function resumoTxt(){
 }
 R.resumo=function(){return '<div class="top"><div><h1>Resumo do dia</h1><div class="sm mt" style="margin-top:4px">Pronto para mandar no grupo do time ou para clientes investidores</div></div><button class="btn p" data-a="copres">Copiar resumo</button></div><div class="panel"><div class="pre">'+esc(resumoTxt())+'</div></div>'};
 
-/* ---------- dados ---------- */
-function usar(j){D.p=j.p.filter(function(p){return Array.isArray(p)&&p[0]});D.m=(j.m||[]).slice().sort(function(a,b){return b[4]-a[4]});D.em=j.em;D.byId={};D.p.forEach(function(p){D.byId[p[0]]=p});D.ok=D.p.length>0;go()}
+/* ---------- acesso por serial + dados cifrados ---------- */
+// O robô publica dados/espelho.enc.json cifrado. Cada serial válido destranca a chave da rodada.
+var SK="esp-jean-serial",ENC=new TextEncoder();
+function unb64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+function norm(s){return String(s||"").trim().toUpperCase()}
+async function idDoSerial(s){var h=new Uint8Array(await crypto.subtle.digest("SHA-256",ENC.encode("espelhos-jean:"+norm(s))));return Array.from(h.slice(0,8)).map(function(x){return x.toString(16).padStart(2,"0")}).join("")}
+async function abrir(pac,serial){
+  var id=await idDoSerial(serial),a=(pac.acessos||[]).filter(function(x){return x.id===id})[0];if(!a)return null;
+  var base=await crypto.subtle.importKey("raw",ENC.encode(norm(serial)),"PBKDF2",false,["deriveKey"]);
+  var ks=await crypto.subtle.deriveKey({name:"PBKDF2",salt:unb64(a.s),iterations:pac.it||210000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["decrypt"]);
+  var k=await crypto.subtle.decrypt({name:"AES-GCM",iv:unb64(a.iv)},ks,unb64(a.w));
+  var kd=await crypto.subtle.importKey("raw",k,"AES-GCM",false,["decrypt"]);
+  var pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:unb64(pac.iv)},kd,unb64(pac.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+function serialSalvo(){try{return localStorage.getItem(SK)||sessionStorage.getItem(SK)}catch(e){return null}}
+function sair(){try{localStorage.removeItem(SK);sessionStorage.removeItem(SK)}catch(e){}D={p:[],m:[],em:0,ok:false,byId:{}};ST8="login";location.hash="";render()}
+function telaLogin(msg){
+  return '<div style="min-height:70vh;display:grid;place-items:center"><form id="lg" class="panel" style="width:min(400px,100%);display:flex;flex-direction:column;gap:14px;padding:24px" autocomplete="off">'+
+  '<div class="brand" style="padding:0"><div class="lg">J</div><div><b>Espelhos</b><small>JEAN Investimentos Imobiliários</small></div></div>'+
+  '<div><h2 style="font-size:22px">Acesso restrito</h2><p class="sm mt" style="margin:6px 0 0">Digite o serial que você recebeu para ver os espelhos de vendas.</p></div>'+
+  '<input class="fld" id="lgs" placeholder="Seu serial" style="height:46px;font-family:var(--fm);font-size:15px;letter-spacing:.04em;text-transform:uppercase" autocapitalize="characters" spellcheck="false" required>'+
+  '<label class="sm" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="lgl" checked> Lembrar neste aparelho</label>'+
+  (msg?'<p class="sm" style="margin:0;color:var(--bd)">'+esc(msg)+'</p>':'')+
+  '<button class="btn p" id="lgb" style="justify-content:center;height:44px">Entrar</button>'+
+  '<p class="sm mt" style="margin:0">Não tem serial? Fale com o Jean pelo WhatsApp.</p></form></div>';
+}
+var MSG="";
+function ligarLogin(){var f=$("#lg");if(!f)return;$("#lgs").focus();f.onsubmit=async function(e){e.preventDefault();var b=$("#lgb"),s=$("#lgs").value;if(!norm(s))return;b.disabled=true;b.textContent="Conferindo…";var ok=await entrarCom(s,$("#lgl").checked);if(!ok){MSG="Serial inválido ou sem acesso. Confira e tente de novo.";render()}}}
 async function pegar(u){try{var r=await fetch(u+"?t="+Date.now(),{cache:"no-store"});return r.ok?await r.json():null}catch(e){return null}}
+async function entrarCom(serial,lembrar){
+  var pac=await pegar("dados/espelho.enc.json");if(!pac){ST8="vazio";render();return true}
+  var j=null;try{j=await abrir(pac,serial)}catch(e){j=null}
+  if(!j){try{localStorage.removeItem(SK);sessionStorage.removeItem(SK)}catch(e){}return false}
+  try{(lembrar?localStorage:sessionStorage).setItem(SK,norm(serial))}catch(e){}
+  MSG="";ST8="ok";usar(j);return true;
+}
+function usar(j){D.p=j.p.filter(function(p){return Array.isArray(p)&&p[0]});D.m=(j.m||[]).slice().sort(function(a,b){return b[4]-a[4]});D.em=j.em;D.byId={};D.p.forEach(function(p){D.byId[p[0]]=p});D.ok=D.p.length>0;if(!D.ok)ST8="vazio";go()}
 async function carregar(){
-  var a=await pegar("dados/espelho.json"),b=await pegar("dados/base.json");
-  if(!a&&!b){ST8="vazio";render();return}
-  var p=(a&&a.p)||[],m=(a&&a.m)||[],ids={};p.forEach(function(x){ids[x[0]]=1});
-  if(b&&b.p){b.p.forEach(function(x){if(!ids[x[0]])p.push(x)});m=m.concat(b.m||[])}
-  ST8="ok";usar({p:p,m:m,em:(a&&a.em)||(b&&b.em)||Date.now()});
+  var s=serialSalvo();
+  if(!s){ST8="login";render();return}
+  var ok=await entrarCom(s,!!(function(){try{return localStorage.getItem(SK)}catch(e){}})());
+  if(!ok){ST8="login";MSG=D.ok?"Seu acesso foi encerrado.":"";D.ok=false;render()}
 }
 
 document.addEventListener("click",function(e){
@@ -380,12 +414,13 @@ document.addEventListener("click",function(e){
   else if(a==="share"){copy(shareTxt(P(d.id)))}
   else if(a==="cmpthis"){UI.cmp.id=d.id;location.hash="comparar"}
   else if(a==="copres"){copy(resumoTxt())}
+  else if(a==="sair"){sair()}
   else if(a==="tema"){var r=document.documentElement,dk=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;r.dataset.theme=dk?"light":"dark";try{localStorage.setItem("esp-jean-tema",r.dataset.theme)}catch(x){}}
 });
 document.addEventListener("keydown",function(e){if(e.key==="Enter"){var c=e.target.closest&&e.target.closest(".card[data-p]");if(c)location.hash="p-"+c.dataset.p}});
 try{var th=localStorage.getItem("esp-jean-tema");if(th)document.documentElement.dataset.theme=th}catch(e){}
 window.addEventListener("hashchange",go);
-render();carregar();setInterval(carregar,10*60*1000);
+render();carregar();setInterval(function(){if(D.ok)carregar()},10*60*1000);
 </script>
 </body>
 </html>

@@ -4,19 +4,23 @@
 import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
+import { cifrar, lerSeriais } from "./cripto.mjs";
 
 const RAIZ = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
-const DADOS = path.join(RAIZ, "docs", "dados");
+const DADOS = path.join(RAIZ, "docs", "dados");      // só vai o arquivo cifrado
+const ESTADO = path.join(RAIZ, "estado");             // fica no cache do GitHub Actions, fora do repositório
 const DEBUG = path.join(RAIZ, "debug");
 fs.mkdirSync(DADOS, { recursive: true });
+fs.mkdirSync(ESTADO, { recursive: true });
 fs.mkdirSync(DEBUG, { recursive: true });
 
 const USUARIO = process.env.ORULO_USUARIO, SENHA = process.env.ORULO_SENHA;
 if (!USUARIO || !SENHA) { console.error("Faltam os secrets ORULO_USUARIO e ORULO_SENHA."); process.exit(1); }
 
 const PORTAIS = JSON.parse(fs.readFileSync(path.join(RAIZ, "robo", "portais.json"), "utf8"));
-const ler = (f, d) => { try { return JSON.parse(fs.readFileSync(path.join(DADOS, f), "utf8")); } catch { return d; } };
-const gravar = (f, o) => fs.writeFileSync(path.join(DADOS, f), JSON.stringify(o));
+// lê o estado do cache; na primeira vez aproveita os arquivos antigos que ficavam abertos em docs/dados
+const ler = (f, d) => { for (const dir of [ESTADO, DADOS]) { try { return JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")); } catch { } } return d; };
+const gravar = (f, o) => fs.writeFileSync(path.join(ESTADO, f), JSON.stringify(o));
 
 const ST = { "disponível": "disponivel", "disponivel": "disponivel", "reservada": "reservada", "vendida": "vendida", "venda suspensa": "suspensa", "em processo": "processo_final" };
 const stCod = s => ST[String(s || "").trim().toLowerCase()] || String(s || "").trim().toLowerCase();
@@ -62,7 +66,6 @@ async function entrar(page, sub) {
   await pw.first().waitFor({ timeout: 30000 });
   if (await usr.count() && !(await usr.inputValue().catch(() => ""))) await usr.fill(USUARIO.trim());
   await pw.first().fill(SENHA);
-  await print(page, `${sub}-2-preenchido`);
   const btn = page.locator('button:has-text("Fazer login"), button[type="submit"]:not([id^="hj-"]), button:has-text("Entrar")').first();
   if (await btn.count()) await btn.click(); else await pw.first().press("Enter");
   await page.waitForFunction(() => !document.querySelector('input[type="password"]'), null, { timeout: 45000 }).catch(() => { });
@@ -82,7 +85,6 @@ async function listar(page, sub) {
   await page.goto(`https://${sub}.portal.orulo.com.br/empreendimentos`, { waitUntil: "networkidle" });
   await page.waitForTimeout(2000);
   console.log("  lista:", page.url());
-  await print(page, `${sub}-4-lista`);
   return await page.$$eval('a[href*="/empreendimentos/"]', as => {
     const m = {};
     for (const a of as) {
@@ -184,7 +186,6 @@ async function main() {
             if (velho && (!v || v[0] !== s)) movs.unshift([pid, numDe(u.reference), v ? v[0] : "novo", s, agora, pr || (v && v[1]) || null, u.private_area || null, tipoTxt(u), s]);
           }
           novo[pid] = mapa;
-          console.log(`  ${p[1]}: ${us.length} unidades, ${p[8]} livres`);
         } catch (e) {
           erros.push(`${construtora} ${b.nome}: ${e.message}`);
           if (antes[`orulo-${sub}-${b.id}`]) novo[`orulo-${sub}-${b.id}`] = antes[`orulo-${sub}-${b.id}`];
@@ -203,7 +204,13 @@ async function main() {
   const m = movs.filter(x => x[4] >= limite).slice(0, 6000);
   gravar("unidades.json", novo);
   gravar("movimentos.json", m);
-  gravar("espelho.json", { v: 1, em: Date.now(), fontes, erros, p: projetos, m });
+  const espelho = { v: 1, em: Date.now(), fontes, erros, p: projetos, m };
+  gravar("espelho.json", espelho);
+  const seriais = lerSeriais(process.env.SERIAIS);
+  if (!seriais.length) console.log("Aviso: o secret SERIAIS está vazio, ninguém vai conseguir abrir o site.");
+  fs.writeFileSync(path.join(DADOS, "espelho.enc.json"), JSON.stringify(await cifrar(espelho, seriais)));
+  for (const f of ["espelho.json", "unidades.json", "movimentos.json"]) fs.rmSync(path.join(DADOS, f), { force: true });
+  console.log(`Dados cifrados para ${seriais.length} serial(is).`);
   console.log(`Total: ${projetos.length} projetos, ${m.length} movimentações guardadas.`);
   if (erros.length) { console.log("Erros:\n" + erros.join("\n")); if (!projetos.length) process.exit(1); }
 }
