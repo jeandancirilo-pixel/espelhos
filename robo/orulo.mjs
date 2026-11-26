@@ -158,7 +158,8 @@ async function materiais(page, sub, id) {
         let achou = null;
         const ouvir = r => { const ct = (r.headers()["content-type"] || ""); if (!achou && (/application\/pdf/.test(ct) || /\.pdf(\?|$)/i.test(r.url()))) achou = r.url(); };
         page.on("response", ouvir);
-        await page.goto(a.u, { waitUntil: "networkidle", timeout: 30000 }).catch(() => { });
+        await page.goto(a.u, { waitUntil: "domcontentloaded", timeout: 25000 }).catch(() => { });
+        await page.waitForTimeout(3000);
         await page.waitForTimeout(1500);
         if (!achou) achou = await page.evaluate(() => { const e = document.querySelector('iframe[src*=".pdf"], embed[src], object[data], a[href$=".pdf"]'); return e ? (e.src || e.data || e.href) : null; }).catch(() => null);
         page.off("response", ouvir);
@@ -223,6 +224,8 @@ async function main() {
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ locale: "pt-BR", timezoneId: "America/Sao_Paulo", viewport: { width: 1366, height: 900 } });
   const page = await ctx.newPage();
+  page.setDefaultTimeout(20000);            // nenhum clique ou espera trava a rodada
+  page.setDefaultNavigationTimeout(45000);
   for (const portal of PORTAIS) {
     const { sub, construtora } = portal;
     try {
@@ -232,7 +235,9 @@ async function main() {
       for (const b of lista) {
         try {
           const det = await detalhes(page, sub, b.id);
-          const mat = await materiais(page, sub, b.id);
+          // materiais têm no máximo 90 s por projeto; se passar, segue sem eles (usa os da rodada anterior)
+          const velhoMat = (anterior.p.find(x => x[0] === `orulo-${sub}-${b.id}`) || [])[35] || null;
+          const mat = await Promise.race([materiais(page, sub, b.id), new Promise(r => setTimeout(() => r(null), 90000))]) || velhoMat;
           const us = await unidades(page, sub, b.id);
           const p = montar(sub, construtora, b, det, us);
           p[35] = mat;
