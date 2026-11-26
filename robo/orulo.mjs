@@ -237,7 +237,14 @@ async function main() {
           const det = await detalhes(page, sub, b.id);
           // materiais têm no máximo 90 s por projeto; se passar, segue sem eles (usa os da rodada anterior)
           const velhoMat = (anterior.p.find(x => x[0] === `orulo-${sub}-${b.id}`) || [])[35] || null;
-          const mat = await Promise.race([materiais(page, sub, b.id), new Promise(r => setTimeout(() => r(null), 90000))]) || velhoMat;
+          const pm = await ctx.newPage(); pm.setDefaultTimeout(20000); pm.setDefaultNavigationTimeout(45000);
+          let mat = null;
+          try {
+            await pm.goto(`https://${sub}.portal.orulo.com.br/empreendimentos/${b.id}`, { waitUntil: "networkidle" });
+            mat = await Promise.race([materiais(pm, sub, b.id), new Promise(r => setTimeout(() => r(null), 90000))]);
+          } catch { }
+          await pm.close().catch(() => { });
+          mat = mat || velhoMat;
           const us = await unidades(page, sub, b.id);
           const p = montar(sub, construtora, b, det, us);
           p[35] = mat;
