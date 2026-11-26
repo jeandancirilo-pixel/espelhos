@@ -44,11 +44,15 @@ async function entrar(page, sub) {
   await print(page, `${sub}-1-login`);
   const pw = page.locator('input[type="password"]');
   if (!(await pw.count())) {
-    // alguns portais pedem o e-mail primeiro e só depois a senha
+    // a Órulo abre em auth.orulo.com.br com vários jeitos de entrar: escolhe "Continuar com e-mail"
+    const comEmail = page.getByText(/Continuar com e-?mail/i).first();
+    if (await comEmail.count()) { await comEmail.click().catch(() => { }); await page.waitForTimeout(2500); }
+  }
+  if (!(await pw.count())) {
     const btnEntrar = page.locator('a:has-text("Entrar"), button:has-text("Entrar"), a:has-text("Login"), button:has-text("Login")').first();
     if (await btnEntrar.count()) { await btnEntrar.click().catch(() => { }); await page.waitForTimeout(2500); }
   }
-  const usr = page.locator('input[type="email"], input[name*="email" i], input[name*="login" i], input[name*="user" i], input[type="text"]').first();
+  const usr = page.locator('input#email, input[type="email"], input[name*="email" i], input[name*="login" i], input[name*="user" i], input[type="text"]').first();
   if (!(await pw.count()) && (await usr.count())) {
     await usr.fill(USUARIO);
     const seguir = page.locator('button[type="submit"], button:has-text("Continuar"), button:has-text("Próximo"), button:has-text("Avançar")').first();
@@ -59,7 +63,7 @@ async function entrar(page, sub) {
   if (await usr.count() && !(await usr.inputValue().catch(() => ""))) await usr.fill(USUARIO);
   await pw.first().fill(SENHA);
   await print(page, `${sub}-2-preenchido`);
-  const btn = page.locator('button[type="submit"], button:has-text("Entrar"), button:has-text("Acessar")').first();
+  const btn = page.locator('button:has-text("Fazer login"), button[type="submit"]:not([id^="hj-"]), button:has-text("Entrar")').first();
   if (await btn.count()) await btn.click(); else await pw.first().press("Enter");
   await page.waitForFunction(() => !document.querySelector('input[type="password"]'), null, { timeout: 45000 }).catch(() => { });
   await page.waitForTimeout(3000);
