@@ -118,6 +118,11 @@ dialog::backdrop{background:#000a}
 .un:has(input:checked){border-color:var(--ac);background:var(--acs)}
 .un input{width:18px;height:18px;accent-color:var(--ac)}
 .uns{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow:auto;padding-right:4px}
+.gal{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.gal a{flex:none;display:block;border-radius:10px;overflow:hidden;border:1px solid var(--ln);background:var(--sf2)}
+.gal img{display:block;height:120px;width:auto;max-width:220px;object-fit:cover}
+.gal.pl img{background:#fff;object-fit:contain;width:160px}
+.gal figcaption{font-size:11.5px;color:var(--mt);padding:4px 6px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pre{white-space:pre-wrap;background:var(--sf2);border-radius:12px;padding:14px;font-size:13.5px;line-height:1.55}
 @media(max-width:820px){
   .app{flex-direction:column}
@@ -180,9 +185,11 @@ var ICO={
  tabelas:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>',
  comparar:'<rect x="3" y="4" width="7" height="16" rx="1.5"/><rect x="14" y="4" width="7" height="16" rx="1.5"/>',
  mercado:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
- resumo:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>'
+ resumo:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>',
+ docs:'<path d="M4 4h6l2 2h8v14H4z"/>',
+ enviadas:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>'
 };
-var NAV=[["inicio","Início"],["imoveis","Imóveis"],["pregao","Pregão"],["tabelas","Tabelas"],["comparar","Comparar"],["mercado","Mercado"],["resumo","Resumo do dia"]];
+var NAV=[["inicio","Início"],["imoveis","Imóveis"],["pregao","Pregão"],["tabelas","Tabelas"],["comparar","Comparar"],["enviadas","Enviadas"],["docs","Documentos"],["mercado","Mercado"],["resumo","Resumo do dia"]];
 var cur="inicio",R={},A={};
 function rail(){
   var v=cur.indexOf("p-")===0?"tabelas":cur;
@@ -282,10 +289,55 @@ R.projeto=function(id){
    '<div><div class="sm" style="display:flex;gap:14px;flex-wrap:wrap"><span class="pill st-disponivel">'+p[F.disp]+' disponíveis</span><span class="pill st-reservada">'+p[F.res]+' reservadas</span>'+(p[F.proc]?'<span class="pill st-processo_final">'+p[F.proc]+' em processo</span>':'')+'<span class="pill st-vendida">'+p[F.vend]+' vendidas</span><span class="mt">de '+p[F.tot]+' unidades · '+pc(p[F.vend],tot)+'% vendido</span></div><div class="prog" style="height:12px;margin-top:8px"><i style="width:'+pc(p[F.vend],tot)+'%;background:var(--bd)"></i><i style="width:'+pc(p[F.proc],tot)+'%;background:var(--in)"></i><i style="width:'+pc(p[F.res],tot)+'%;background:var(--wn)"></i><i style="width:'+pc(p[F.disp],tot)+'%;background:var(--ok)"></i></div></div>'+
    '<div class="sm" style="display:flex;gap:8px 18px;flex-wrap:wrap"><span><span class="mt">Endereço:</span> '+esc(p[F.end]||"—")+(p[F.cid]&&p[F.cid]!=="São Paulo"?" · "+esc(p[F.cid]):"")+'</span>'+(p[F.tab]?'<span><span class="mt">Fonte:</span> '+esc(p[F.tab])+'</span>':'')+(cats.length?'<span><span class="mt">Enquadramento:</span> '+esc(cats.join(", "))+'</span>':'')+'<span class="mt">Espelho lido '+quando(new Date(p[F.upd]).getTime())+'</span></div>'+
    '<div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn s" href="'+esc(maps)+'" target="_blank" rel="noopener">Ver no mapa ↗</a><button class="btn s p" data-a="mandar" data-id="'+esc(id)+'">Mandar pro cliente</button><button class="btn s" data-a="share" data-id="'+esc(id)+'">Copiar texto</button><button class="btn s" data-a="cmpthis" data-id="'+esc(id)+'">Comparar com outros</button></div></div></section>'+
+  matHtml(p)+
   '<div class="g g2"><section class="panel"><h2>Movimentações recentes</h2><div class="list" style="margin-top:6px">'+(ms.length?ms.slice(0,30).map(function(x){return '<div class="li"><span class="num" style="width:70px"><b>'+esc(x[1])+'</b></span><div class="grow"><span class="sm">'+(ST[x[2]]||x[2])+' → <span class="pill st-'+x[3]+'">'+(ST[x[3]]||x[3])+'</span></span><span class="sm mt" style="display:block">'+esc(x[7]||"")+(x[6]?" · "+m2(x[6]):"")+'</span></div><span class="num sm">'+(x[5]?brl(x[5]):"")+'</span><span class="sm mt" style="width:92px;text-align:right">'+quando(x[4]*1000)+'</span></div>'}).join(""):'<div class="empty">Nenhuma movimentação desde que o robô começou a ler este espelho.</div>')+'</div></section>'+
   '<section class="panel"><h2>Perto daqui</h2><div class="sm mt">Mesmo bairro ou até 2 km, com unidade livre</div><div class="list" style="margin-top:6px">'+(near.length?near.map(function(x){return liP(x[0],'<span class="num sm">'+brlc(x[0][F.pv]||x[0][F.pp])+'</span>')}).join(""):'<div class="empty">Nenhum outro projeto com unidade livre por perto.</div>')+'</div></section></div>';
 };
 function shareTxt(p){return "*"+p[F.n]+"*\n"+(p[F.desc]?p[F.desc]+"\n":"")+"📍 "+(p[F.end]||p[F.bai])+(p[F.bai]?" · "+p[F.bai]:"")+"\n🗓 "+(p[F.fase]==="pronto"?"Pronto para morar":"Entrega: "+entTxt(p))+"\n📐 "+dorms(p).join(", ")+(p[F.m2a]?" · "+m2(p[F.m2a])+(p[F.m2b]&&p[F.m2b]!==p[F.m2a]?" a "+m2(p[F.m2b]):""):"")+"\n💰 A partir de "+brl(p[F.pv]||p[F.pp])+"\n✅ "+p[F.disp]+" unidades disponíveis\n\nJEAN | Investimentos Imobiliários"}
+
+/* ---------- Fotos, plantas e documentos ---------- */
+function mat(p){return p[35]||{}}
+function arqUrl(a){return a.d||a.u}
+function arqBtns(p){var m=mat(p),b=[];(m.arquivos||[]).forEach(function(a){b.push('<a class="btn s" target="_blank" rel="noopener" href="'+esc(arqUrl(a))+'" title="'+esc(a.t)+'">'+({tabela:"Tabela",book:"Book"}[a.tipo]||"Material")+(a.d?"":" (Órulo)")+' ↗</a>')});(m.videos||[]).forEach(function(v){b.push('<a class="btn s" target="_blank" rel="noopener" href="'+esc(v.u)+'">Vídeo ↗</a>')});if(m.tour)b.push('<a class="btn s" target="_blank" rel="noopener" href="'+esc(m.tour)+'">Tour virtual ↗</a>');return b.join("")}
+function matHtml(p){var m=mat(p),f=m.fotos||[],pl=m.plantas||[],b=arqBtns(p);if(!f.length&&!pl.length&&!b)return "";
+  return '<section class="panel" style="display:flex;flex-direction:column;gap:12px">'+(f.length?'<div><h2>Fotos <span class="sm mt">'+f.length+'</span></h2><div class="gal" style="margin-top:8px">'+f.map(function(u){return '<a href="'+esc(u)+'" target="_blank" rel="noopener"><img loading="lazy" src="'+esc(u.replace("/xlarge/","/thumb/"))+'" alt=""></a>'}).join("")+'</div></div>':'')+
+  (pl.length?'<div><h2>Plantas <span class="sm mt">'+pl.length+'</span></h2><div class="gal pl" style="margin-top:8px">'+pl.map(function(x){return '<a href="'+esc(x.u)+'" target="_blank" rel="noopener"><figure style="margin:0"><img loading="lazy" src="'+esc(x.u.replace("/xlarge/","/thumb/"))+'" alt="'+esc(x.t)+'"><figcaption>'+esc(x.t)+'</figcaption></figure></a>'}).join("")+'</div></div>':'')+
+  (b?'<div><h2>Material</h2><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">'+b+'</div><p class="sm mt" style="margin:6px 0 0">Os marcados com "(Órulo)" abrem no portal e pedem o seu login da Órulo.</p></div>':'')+'</section>'}
+R.docs=function(){
+  var q=(UI.dq||"").toLowerCase(),l=D.p.filter(function(p){var m=mat(p);return (m.plantas&&m.plantas.length)||(m.arquivos&&m.arquivos.length)||(m.fotos&&m.fotos.length)}).filter(function(p){return !q||(p[F.n]+" "+p[F.inc]+" "+p[F.bai]).toLowerCase().indexOf(q)>=0}).sort(function(a,b){return a[F.n].localeCompare(b[F.n])});
+  return '<div class="top"><div><h1>Documentos</h1><div class="sm mt" style="margin-top:4px">Book, tabela, plantas, fotos, vídeo e tour de cada projeto, como estão no portal da construtora</div></div></div>'+
+  '<form class="search" id="ds" role="search"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="dsq" placeholder="Projeto, construtora ou bairro" value="'+esc(UI.dq||"")+'" autocomplete="off"></form>'+
+  (l.length?l.map(function(p){var m=mat(p);return '<section class="panel" style="display:flex;flex-direction:column;gap:10px"><div class="li clk" data-p="'+esc(p[F.id])+'" style="border:0;padding:0"><div class="mini" style="'+covBg(p)+'">'+iniOuFoto(p)+'</div><div class="grow"><b>'+esc(p[F.n])+'</b><span class="sm mt">'+esc(p[F.inc])+' · '+esc(p[F.bai]||"")+' · '+(m.plantas||[]).length+' plantas · '+(m.fotos||[]).length+' fotos</span></div></div>'+
+   '<div style="display:flex;gap:8px;flex-wrap:wrap">'+arqBtns(p)+'</div>'+((m.plantas||[]).length?'<div class="gal pl">'+m.plantas.map(function(x){return '<a href="'+esc(x.u)+'" target="_blank" rel="noopener"><figure style="margin:0"><img loading="lazy" src="'+esc(x.u.replace("/xlarge/","/thumb/"))+'" alt="'+esc(x.t)+'"><figcaption>'+esc(x.t)+'</figcaption></figure></a>'}).join("")+'</div>':'')+'</section>'}).join(""):'<div class="panel empty">Os documentos aparecem aqui depois da próxima leitura do robô.</div>');
+};
+A.docs=function(){$("#ds").onsubmit=function(e){e.preventDefault()};var q=$("#dsq");q.oninput=function(){UI.dq=q.value;render2();var z=$("#dsq");z.focus();z.setSelectionRange(z.value.length,z.value.length)}};
+
+/* ---------- Enviadas: links mandados e quando o cliente abriu ----------
+   A página do cliente manda um aviso para o canal ntfy.sh do corretor (gratuito, sem cadastro).
+   O site lê esses avisos e marca o link como aberto; no celular, o app ntfy mostra notificação. */
+var EKEY="esp-jean-enviadas",AKEY="esp-jean-aberturas";
+function lerLS(k,d){try{return JSON.parse(localStorage.getItem(k)||"null")||d}catch(e){return d}}
+function canal(){var a=lerLS(ASS,{});if(!a.t){a.t="espjean-"+Array.from(crypto.getRandomValues(new Uint8Array(10))).map(function(x){return "abcdefghijkmnpqrstuvwxyz23456789"[x%32]}).join("");try{localStorage.setItem(ASS,JSON.stringify(a))}catch(e){}}return a.t}
+async function puxarAberturas(){
+  var t=canal(),ab=lerLS(AKEY,{});
+  try{var r=await fetch("https://ntfy.sh/"+t+"/json?poll=1&since=all");var tx=await r.text();
+    tx.split("\n").forEach(function(l){if(!l.trim())return;try{var m=JSON.parse(l);if(m.event!=="message")return;var g=String(m.message||"").match(/\[(\w{6,})\]/);if(!g)return;var id=g[1],ev=/interesse/i.test(m.message)?"i":"a";ab[id]=ab[id]||{a:[],i:[]};if(ab[id][ev].indexOf(m.time)<0)ab[id][ev].push(m.time)}catch(e){}});
+    localStorage.setItem(AKEY,JSON.stringify(ab));UI.ntfyOk=true}catch(e){UI.ntfyOk=false}
+  return ab;
+}
+R.enviadas=function(){
+  var en=lerLS(EKEY,[]),ab=lerLS(AKEY,{}),t=canal(),f=UI.ef||"";
+  var st=function(e){var x=ab[e.i]||{a:[],i:[]};return x.i.length?"i":x.a.length?"a":"n"};
+  var abertos=en.filter(function(e){return st(e)!=="n"}).length,l=en.filter(function(e){return !f||st(e)===f});
+  return '<div class="top"><div><h1>Enviadas</h1><div class="sm mt" style="margin-top:4px">Os links que você mandou e quando o cliente abriu</div></div><button class="btn s" data-a="atuenv">Atualizar</button></div>'+
+  '<div class="g g4">'+kv("Links enviados",en.length)+kv("Abertos",abertos)+kv("Não abriram",en.length-abertos)+kv("Pediram contato",en.filter(function(e){return st(e)==="i"}).length)+'</div>'+
+  '<section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2>Links</h2><div class="seg">'+[["","Todos"],["a","Abriram"],["n","Não abriram"],["i","Tenho interesse"]].map(function(x){return '<button data-ef="'+x[0]+'" class="'+(f===x[0]?"on":"")+'">'+x[1]+'</button>'}).join("")+'</div></div><div class="list" style="margin-top:6px">'+
+   (l.length?l.map(function(e){var x=ab[e.i]||{a:[],i:[]},s=st(e),ult=Math.max.apply(null,x.a.concat(x.i).concat([0]))*1000;return '<div class="li"><div class="grow"><b>'+esc(e.c||"Sem nome")+' · '+esc(e.p)+'</b><span class="sm mt">Enviado '+quando(e.em)+' · '+(e.u||[]).length+' unidade'+((e.u||[]).length>1?"s":"")+': '+esc((e.u||[]).slice(0,6).join(", "))+((e.u||[]).length>6?"…":"")+'</span></div>'+
+    '<span class="pill '+(s==="i"?"st-disponivel":s==="a"?"st-processo_final":"st-suspensa")+'">'+(s==="i"?"Tenho interesse":s==="a"?"Abriu "+x.a.length+"x":"Não abriu")+'</span><span class="sm mt" style="width:100px;text-align:right">'+(ult?quando(ult):"")+'</span><a class="btn s" target="_blank" rel="noopener" href="'+esc(e.l)+'">Ver</a><button class="btn s" data-a="recopiar" data-l="'+esc(e.l)+'">Copiar</button></div>'}).join(""):'<div class="empty">'+(en.length?"Nenhum link com esse filtro.":"Nenhum link enviado ainda. Abra um projeto e toque em Mandar pro cliente.")+'</div>')+'</div></section>'+
+  '<section class="panel"><h2>Aviso no celular quando o cliente abrir</h2><p class="sm" style="margin:6px 0 0">Instale o app gratuito <b>ntfy</b> (Android ou iPhone), toque em <b>+</b> e assine o canal abaixo. Você recebe uma notificação na hora em que o cliente abre o link ou toca em "Tenho interesse".</p><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px"><code class="num" style="background:var(--sf2);padding:6px 10px;border-radius:8px">'+esc(t)+'</code><button class="btn s" data-a="copcanal">Copiar canal</button><a class="btn s" target="_blank" rel="noopener" href="https://ntfy.sh/'+esc(t)+'">Abrir no navegador ↗</a></div>'+
+   '<p class="sm mt" style="margin:10px 0 0">A lista de links fica guardada neste aparelho e neste navegador. As aberturas dos últimos dias são buscadas no ntfy sempre que você abre esta tela'+(UI.ntfyOk===false?'; agora não deu para buscar, tente "Atualizar"':'')+'.</p></section>';
+};
+A.enviadas=function(){if(!UI.envPuxou){UI.envPuxou=1;puxarAberturas().then(function(){if(cur==="enviadas")render2()})}};
 
 /* ---------- Mandar pro cliente ---------- */
 // Gera um link para a página cliente.html com os dados das unidades marcadas dentro do próprio link
@@ -311,12 +363,14 @@ function mandarDlg(id){
     var sel=cks().filter(function(c){return c.checked}).map(function(c){return us[+c.value]}),nome=$("#man").value.trim(),wa=$("#maw").value.replace(/\D/g,"");
     if(!sel.length){$("#mmsg").textContent="Marque pelo menos uma unidade.";return}
     if(!nome||wa.length<10){$("#mmsg").textContent="Coloque seu nome e seu WhatsApp com DDD, para o cliente falar com você.";return}
-    try{localStorage.setItem(ASS,JSON.stringify({n:nome,w:wa}))}catch(x){}
+    try{var as0=lerLS(ASS,{});as0.n=nome;as0.w=wa;localStorage.setItem(ASS,JSON.stringify(as0))}catch(x){}
     var cli=$("#mcn").value.trim();
-    var dados={v:1,em:D.em,c:cli,p:{n:p[F.n],inc:p[F.inc],bai:p[F.bai],cid:p[F.cid],end:p[F.end],ent:entTxt(p),fase:FASE[p[F.fase]]||"",desc:p[F.desc]||"",capa:foto(p),cat:String(p[F.cat]||"")},u:sel,a:{n:nome,w:wa}};
+    var m=mat(p),lid=Array.from(crypto.getRandomValues(new Uint8Array(6))).map(function(x){return x.toString(16).padStart(2,"0")}).join("");
+    var cut=function(u){return String(u).replace("https://static.orulo.com.br/images/properties/xlarge/","~")};
+    var dados={v:1,em:D.em,i:lid,t:canal(),c:cli,p:{n:p[F.n],inc:p[F.inc],bai:p[F.bai],cid:p[F.cid],end:p[F.end],ent:entTxt(p),fase:FASE[p[F.fase]]||"",desc:p[F.desc]||"",capa:cut(foto(p)),cat:String(p[F.cat]||""),f:(m.fotos||[]).slice(0,10).map(cut),pl:(m.plantas||[]).map(function(x){return[x.t,cut(x.u)]}),tour:m.tour||"",vid:((m.videos||[])[0]||{}).u||""},u:sel,a:{n:nome,w:wa}};
     var link=location.origin+location.pathname.replace(/index\.html$/,"").replace(/\/?$/,"/")+"cliente.html#"+b64url(JSON.stringify(dados));
     var msg=(cli?"Olá, "+cli.split(" ")[0]+"! ":"Olá! ")+"Separei "+(sel.length>1?sel.length+" unidades":"uma unidade")+" do "+p[F.n]+" para você ver, com fotos e valores:\n"+link;
-    try{var en=JSON.parse(localStorage.getItem("esp-jean-enviadas")||"[]");en.unshift({em:Date.now(),c:cli,p:p[F.n],id:p[F.id],u:sel.map(function(u){return u[0]}),l:link});localStorage.setItem("esp-jean-enviadas",JSON.stringify(en.slice(0,200)))}catch(x){}
+    try{var en=JSON.parse(localStorage.getItem("esp-jean-enviadas")||"[]");en.unshift({em:Date.now(),i:lid,c:cli,p:p[F.n],id:p[F.id],u:sel.map(function(u){return u[0]}),l:link});localStorage.setItem("esp-jean-enviadas",JSON.stringify(en.slice(0,200)))}catch(x){}
     $("#dbody").innerHTML='<div class="fh"><div><h2 style="font-size:20px">Link pronto</h2><div class="sm mt">'+esc(p[F.n])+' · '+sel.length+' unidade'+(sel.length>1?"s":"")+(cli?' para '+esc(cli):'')+'</div></div><button type="button" class="btn s" id="mx2">✕</button></div><div class="fb"><div class="pre" style="word-break:break-all">'+esc(msg)+'</div>'+
      '<div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn p" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(msg)+'">Enviar no WhatsApp</a><button type="button" class="btn" id="mcp">Copiar mensagem</button><button type="button" class="btn" id="mcl">Copiar só o link</button><a class="btn" target="_blank" rel="noopener" href="'+esc(link)+'">Ver como o cliente vê ↗</a></div></div>';
     $("#mx2").onclick=function(){d.close()};$("#mcp").onclick=function(){copy(msg)};$("#mcl").onclick=function(){copy(link)};
@@ -446,7 +500,7 @@ async function carregar(){
 }
 
 document.addEventListener("click",function(e){
-  var b=e.target.closest("[data-p],[data-a],[data-fk],[data-fmax],[data-rank],[data-pf],[data-mot],[data-mper]");if(!b)return;var d=b.dataset;
+  var b=e.target.closest("[data-p],[data-a],[data-fk],[data-fmax],[data-rank],[data-pf],[data-mot],[data-mper],[data-ef]");if(!b)return;var d=b.dataset;
   if(d.p){location.hash="p-"+d.p;return}
   if(d.fk){var arr=UI.f[d.fk],i=arr.indexOf(d.fv);if(i>=0)arr.splice(i,1);else arr.push(d.fv);UI.lim=60;render2();return}
   if(d.fmax){UI.f.max=+UI.f.max===+d.fmax?"":d.fmax;render2();return}
@@ -454,11 +508,15 @@ document.addEventListener("click",function(e){
   if(d.pf!==undefined){UI.pf=d.pf;render2();return}
   if(d.mot){UI.cmp.mot=d.mot;render2();return}
   if(d.mper){UI.mper=d.mper;render2();return}
+  if(d.ef!==undefined){UI.ef=d.ef;render2();return}
   var a=d.a;
   if(a==="limpar"){UI.f={q:"",modo:"pp",min:"",max:"",dorm:[],zona:[],fase:[],inc:[],cat:[],vaga:"",ent:"",sort:"vend"};render2()}
   else if(a==="mais"){UI.lim=(UI.lim||60)+60;render2()}
   else if(a==="share"){copy(shareTxt(P(d.id)))}
   else if(a==="mandar"){mandarDlg(d.id)}
+  else if(a==="atuenv"){puxarAberturas().then(function(){render2();toast("Atualizado")})}
+  else if(a==="recopiar"){copy(d.l)}
+  else if(a==="copcanal"){copy(canal())}
   else if(a==="cmpthis"){UI.cmp.id=d.id;location.hash="comparar"}
   else if(a==="copres"){copy(resumoTxt())}
   else if(a==="sair"){sair()}

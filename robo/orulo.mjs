@@ -115,6 +115,61 @@ async function detalhes(page, sub, id) {
   });
 }
 
+// plantas, fotos, vídeo, tour e arquivos (book, tabela) da página do empreendimento
+async function materiais(page, sub, id) {
+  const out = { plantas: [], fotos: [], videos: [], tour: null, arquivos: [] };
+  try {
+    const info = await page.evaluate(() => {
+      const abs = h => { try { return new URL(h, location.href).href; } catch { return h; } };
+      const links = [...document.querySelectorAll("a[href]")];
+      return {
+        tour: (links.find(a => /tour virtual/i.test(a.textContent)) || {}).href || null,
+        videos: links.filter(a => /vimeo|youtu/i.test(a.href)).map(a => ({ t: a.textContent.trim(), u: a.href })),
+        arquivos: links.filter(a => /\/arquivos\/\d+/.test(a.getAttribute("href"))).map(a => ({ t: a.textContent.trim(), u: abs(a.getAttribute("href")) }))
+      };
+    });
+    Object.assign(out, info);
+    // a galeria e as plantas carregam as imagens quando abertas
+    const coletar = async (abrir) => {
+      const urls = [];
+      const ouvir = r => { const u = r.url(); if (/static\.orulo\.com\.br\/images\/properties\/thumb\//.test(u) && !urls.includes(u)) urls.push(u); };
+      page.on("response", ouvir);
+      try { await abrir(); await page.waitForTimeout(2500); } catch { }
+      page.off("response", ouvir);
+      await page.keyboard.press("Escape").catch(() => { });
+      await page.waitForTimeout(500);
+      return urls.map(u => u.replace("/thumb/", "/xlarge/"));
+    };
+    const bPlantas = page.getByRole("button", { name: /^Plantas/ }).first();
+    if (await bPlantas.count()) {
+      await bPlantas.click().catch(() => { });
+      await page.waitForTimeout(800);
+      const nomes = await page.$$eval("button", bs => { const i = bs.findIndex(b => /^Plantas/.test(b.textContent.trim())); const r = []; for (let k = i + 1; k < bs.length; k++) { const t = bs[k].textContent.trim(); if (/^(Tabelas|Outros|Vídeos|Entre em contato)/.test(t)) break; r.push(t); } return r; });
+      if (nomes.length) {
+        const urls = await coletar(() => page.getByRole("button", { name: nomes[0], exact: true }).first().click());
+        out.plantas = urls.slice(0, nomes.length).map((u, i) => ({ t: nomes[i] || `Planta ${i + 1}`, u }));
+      }
+    }
+    const bGal = page.getByRole("button", { name: /Ver galeria/i }).first();
+    if (await bGal.count()) out.fotos = (await coletar(() => bGal.click())).slice(0, 30);
+    // tenta achar o arquivo direto (PDF) de cada material
+    for (const a of out.arquivos) {
+      try {
+        let achou = null;
+        const ouvir = r => { const ct = (r.headers()["content-type"] || ""); if (!achou && (/application\/pdf/.test(ct) || /\.pdf(\?|$)/i.test(r.url()))) achou = r.url(); };
+        page.on("response", ouvir);
+        await page.goto(a.u, { waitUntil: "networkidle", timeout: 30000 }).catch(() => { });
+        await page.waitForTimeout(1500);
+        if (!achou) achou = await page.evaluate(() => { const e = document.querySelector('iframe[src*=".pdf"], embed[src], object[data], a[href$=".pdf"]'); return e ? (e.src || e.data || e.href) : null; }).catch(() => null);
+        page.off("response", ouvir);
+        if (achou && !/X-Amz-Signature|Signature=|token=|Expires=/i.test(achou)) a.d = achou;
+      } catch { }
+      a.tipo = /tabela/i.test(a.t) ? "tabela" : /book/i.test(a.t) ? "book" : "material";
+    }
+  } catch (e) { console.log("  materiais:", e.message); }
+  return out;
+}
+
 async function unidades(page, sub, id) {
   const url = `https://${sub}.portal.orulo.com.br/empreendimentos/${id}/unidades?status[]=available&status[]=reserved&status[]=sold`;
   const espera = page.waitForResponse(r => r.url().includes(`/api/buildings/${id}/units`) && r.status() === 200, { timeout: 45000 });
@@ -177,8 +232,10 @@ async function main() {
       for (const b of lista) {
         try {
           const det = await detalhes(page, sub, b.id);
+          const mat = await materiais(page, sub, b.id);
           const us = await unidades(page, sub, b.id);
           const p = montar(sub, construtora, b, det, us);
+          p[35] = mat;
           projetos.push(p);
           const pid = p[0], velho = antes[pid] || null, mapa = {};
           for (const u of us) {

@@ -35,6 +35,13 @@ h2{font:600 22px var(--fd);margin:0 0 4px}
 .bar{position:fixed;left:0;right:0;bottom:0;background:var(--sf);border-top:1px solid var(--ln);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:flex;gap:12px;align-items:center;justify-content:center;z-index:5}
 .bar .who{font-size:13px;color:var(--mt)}.bar .who b{display:block;color:var(--tx);font-size:15px}
 .wa{display:inline-flex;align-items:center;gap:8px;background:#1f8a4c;color:#fff;text-decoration:none;font-weight:600;padding:12px 18px;border-radius:12px}
+.gal{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}
+.gal a{flex:none;scroll-snap-align:start;border-radius:12px;overflow:hidden;background:#fff;border:1px solid var(--ln);display:block}
+.gal img{display:block;height:200px;width:auto;max-width:320px;object-fit:cover}
+.gal.pl img{height:220px;width:240px;object-fit:contain}
+.gal figcaption{font-size:12.5px;color:var(--mt);padding:6px 8px}
+.bts{display:flex;gap:8px;flex-wrap:wrap}
+.bt{display:inline-flex;border:1px solid var(--ln);background:var(--sf);border-radius:10px;padding:8px 14px;font-weight:600;font-size:14px;color:var(--tx);text-decoration:none}
 .erro{max-width:520px;margin:20vh auto;text-align:center;padding:20px}
 </style>
 </head>
@@ -48,23 +55,34 @@ function m2(v){return v==null?"":v.toLocaleString("pt-BR",{maximumFractionDigits
 function andar(a){return a==null?"":a===0?"Térreo":a+"º andar"}
 function ler(){try{var h=location.hash.slice(1).replace(/-/g,"+").replace(/_/g,"/");while(h.length%4)h+="=";var b=atob(h),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return JSON.parse(new TextDecoder().decode(u))}catch(e){return null}}
 var D=ler(),app=document.getElementById("app");
+var ST="https://static.orulo.com.br/images/properties/xlarge/";
+function full(u){return String(u||"").charAt(0)==="~"?ST+String(u).slice(1):u}
+function thumb(u){return full(u).replace("/xlarge/","/thumb/")}
+// avisa o corretor (canal ntfy dele) que o link foi aberto ou que o cliente pediu contato
+function avisar(ev){try{if(!D||!D.t||!D.i)return;var k="cli-av-"+D.i+"-"+ev;if(ev==="a"&&localStorage.getItem(k))return;localStorage.setItem(k,"1")}catch(e){}
+  var nome=(D.c||"Cliente").split(" ")[0],txt=(ev==="i"?"🔥 "+nome+" tocou em Tenho interesse":"👀 "+nome+" abriu o link")+" · "+D.p.n+" ["+D.i+"]";
+  try{fetch("https://ntfy.sh/"+encodeURIComponent(D.t),{method:"POST",body:txt,keepalive:true}).catch(function(){})}catch(e){}}
 if(!D||!D.p||!D.u){app.innerHTML='<div class="erro"><h2>Link incompleto</h2><p class="mt">Peça para o corretor enviar o link de novo.</p></div>'}
 else{
   var p=D.p,a=D.a||{},wa=String(a.w||"").replace(/\D/g,"");if(wa&&wa.length<=11)wa="55"+wa;
   var menor=Math.min.apply(null,D.u.map(function(u){return u[4]||9e12}));
   var zap=function(txt){return "https://wa.me/"+wa+"?text="+encodeURIComponent(txt)};
   document.title=p.n+" · unidades selecionadas para você";
-  app.innerHTML='<header class="hero" style="'+(p.capa?"background-image:url('"+esc(p.capa).replace(/'/g,"%27")+"')":"")+'"><div class="in"><span class="tag">'+esc([p.fase,p.ent&&p.ent!=="Pronto"?"entrega "+p.ent:""].filter(Boolean).join(" · "))+'</span><h1>'+esc(p.n)+'</h1><div class="sub">'+esc([p.inc,p.bai,p.cid&&p.cid!=="São Paulo"?p.cid:""].filter(Boolean).join(" · "))+'</div></div></header>'+
+  app.innerHTML='<header class="hero" style="'+(p.capa?"background-image:url('"+esc(full(p.capa)).replace(/'/g,"%27")+"')":"")+'"><div class="in"><span class="tag">'+esc([p.fase,p.ent&&p.ent!=="Pronto"?"entrega "+p.ent:""].filter(Boolean).join(" · "))+'</span><h1>'+esc(p.n)+'</h1><div class="sub">'+esc([p.inc,p.bai,p.cid&&p.cid!=="São Paulo"?p.cid:""].filter(Boolean).join(" · "))+'</div></div></header>'+
   '<main>'+(D.c?'<div class="oi">Olá, '+esc(D.c.split(" ")[0])+'! Separei estas unidades para você.</div>':'<div class="oi">Unidades selecionadas para você</div>')+
   (p.desc?'<p style="margin:0" class="mt">'+esc(p.desc)+'</p>':'')+
   '<section class="card kv"><div><small>A partir de</small><b>'+brl(menor)+'</b></div><div><small>Entrega</small><b>'+esc(p.ent||"—")+'</b></div><div><small>Endereço</small><b style="font-size:15px">'+esc(p.end||p.bai||"—")+'</b></div><div><small>Unidades</small><b>'+D.u.length+'</b></div></section>'+
   '<section class="card"><h2>Unidades</h2><div class="sm mt">Valores de tabela'+(D.em?' consultados em '+new Date(D.em).toLocaleDateString("pt-BR")+'':'')+', sujeitos a alteração e à disponibilidade.</div>'+
-   D.u.map(function(u){return '<div class="u"><div class="n">'+esc(u[0])+'</div><div class="d"><b>'+esc(u[1]||"")+'</b>'+esc([m2(u[2]),andar(u[3])].filter(Boolean).join(" · "))+'</div><div class="p"><b>'+brl(u[4])+'</b>'+(wa?'<a target="_blank" rel="noopener" href="'+zap("Olá, "+(a.n||"")+"! Tenho interesse na unidade "+u[0]+" do "+p.n+".")+'">Tenho interesse</a>':'')+'</div></div>'}).join("")+
+   D.u.map(function(u){return '<div class="u"><div class="n">'+esc(u[0])+'</div><div class="d"><b>'+esc(u[1]||"")+'</b>'+esc([m2(u[2]),andar(u[3])].filter(Boolean).join(" · "))+'</div><div class="p"><b>'+brl(u[4])+'</b>'+(wa?'<a target="_blank" rel="noopener" href="'+zap("Olá, "+(a.n||"")+"! Tenho interesse na unidade "+u[0]+" do "+p.n+".")+'" data-int="1">Tenho interesse</a>':'')+'</div></div>'}).join("")+
   '</section>'+
+  ((p.f||[]).length?'<section><h2>Fotos</h2><div class="gal" style="margin-top:10px">'+p.f.map(function(u){return '<a href="'+esc(full(u))+'" target="_blank" rel="noopener"><img loading="lazy" src="'+esc(full(u))+'" alt=""></a>'}).join("")+'</div></section>':'')+
+  ((p.pl||[]).length?'<section><h2>Plantas</h2><div class="gal pl" style="margin-top:10px">'+p.pl.map(function(x){return '<a href="'+esc(full(x[1]))+'" target="_blank" rel="noopener"><figure style="margin:0"><img loading="lazy" src="'+esc(full(x[1]))+'" alt="'+esc(x[0])+'"><figcaption>'+esc(x[0])+'</figcaption></figure></a>'}).join("")+'</div></section>':'')+
+  ((p.tour||p.vid)?'<div class="bts">'+(p.tour?'<a class="bt" target="_blank" rel="noopener" href="'+esc(p.tour)+'">Tour virtual ↗</a>':'')+(p.vid?'<a class="bt" target="_blank" rel="noopener" href="'+esc(p.vid)+'">Vídeo do projeto ↗</a>':'')+'</div>':'')+
   (p.end?'<a class="sm" style="color:var(--ac);font-weight:600" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.end+" "+(p.bai||"")+" "+(p.cid||""))+'">Ver a localização no mapa ↗</a>':'')+
   '<p class="sm mt" style="margin:8px 0 0">'+esc(a.n||"")+' · JEAN | Investimentos Imobiliários</p></main>'+
   (wa?'<div class="bar"><div class="who">Seu corretor<b>'+esc(a.n||"")+'</b></div><a class="wa" target="_blank" rel="noopener" href="'+zap("Olá, "+(a.n||"")+"! Vi as unidades do "+p.n+" que você me mandou.")+'">Falar no WhatsApp</a></div>':'');
 }
+if(D&&D.p){avisar("a");document.addEventListener("click",function(e){var a=e.target.closest("a.wa,[data-int]");if(a)avisar("i")})}
 </script>
 </body>
 </html>
