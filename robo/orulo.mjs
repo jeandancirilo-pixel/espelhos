@@ -24,7 +24,7 @@ const MES = { jan: 1, fev: 2, mar: 3, abr: 4, mai: 5, jun: 6, jul: 7, ago: 8, se
 const ZONA = {
   sul: /jabaquara|ipiranga|sa[uú]de|vila mariana|moema|campo belo|santo amaro|brooklin|vila ol[ií]mpia|cursino|sacom[aã]|interlagos|socorro|chácara santo ant|morumbi|campo limpo|vila clementino|paraíso|aclimação/i,
   oeste: /perdizes|pinheiros|lapa|butant[aã]|pomp[eé]ia|vila romana|barra funda|alto de pinheiros|sumar[eé]|vila madalena|jaguar[eé]|rio pequeno|vila leopoldina|água branca/i,
-  leste: /tatuap[eé]|carr[aã]o|mooca|penha|patriarca|vila formosa|an[aá]lia franco|bel[eé]m|br[aá]s|itaquera|guilhermina|esperan[cç]a|aricanduva|vila prudente|água rasa|vila matilde/i,
+  leste: /tatuap[eé]|carr[aã]o|mooca|penha|patriarca|vila formosa|an[aá]lia franco|bel[eé]m|br[aá]s|itaquera|guilhermina|esperan[cç]a|aricanduva|vila prudente|água rasa|vila matilde|vila r[eé]|ermelino|são miguel|guaianases|itaim paulista/i,
   norte: /santana|tucuruvi|vila guilherme|casa verde|freguesia do [oó]|limão|mandaqui|vila maria|parada inglesa/i,
   centro: /bela vista|consola[cç][aã]o|rep[uú]blica|liberdade|santa cec[ií]lia|vila buarque|bom retiro|cambuci|centro|s[eé]$|higien[oó]polis|jardins|jardim paulista|cerqueira c[eé]sar|vergueiro/i
 };
@@ -106,9 +106,9 @@ async function detalhes(page, sub, id) {
     const img = document.querySelector('img[alt*="capa" i]') || document.querySelector('meta[property="og:image"]');
     return {
       end, entMes: ent[1] || null, entAno: ent[2] || null,
-      fase: /BREVE LAN/i.test(txt) ? "breve" : /EM CONSTRU/i.test(txt) ? "obras" : /PRONTO/i.test(txt) ? "pronto" : /LAN[CÇ]AMENTO/i.test(txt) ? "lanc" : null,
+      fase: /\bEM CONSTRU/.test(txt) ? "obras" : /\bPRONTO\b/.test(txt) ? "pronto" : /\bBREVE LAN[CÇ]AMENTO\b/.test(txt.replace(/Breve Lan[cç]amento/g, "")) ? "breve" : /\bLAN[CÇ]AMENTO\b/.test(txt) ? "lanc" : null,
       desc: iD >= 0 ? (linhas[iD + 1] || "").replace(/Preço e disponibilidade.*$/i, "").trim() : "",
-      capa: img ? (img.currentSrc || img.src || img.content || "") : ""
+      capa: (() => { const u = img ? (img.currentSrc || img.src || img.content || "") : ""; const m = u.match(/[?&]url=([^&]+)/); return m ? decodeURIComponent(m[1]) : u; })()
     };
   });
 }
