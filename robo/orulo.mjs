@@ -54,13 +54,13 @@ async function entrar(page, sub) {
   }
   const usr = page.locator('input#email, input[type="email"], input[name*="email" i], input[name*="login" i], input[name*="user" i], input[type="text"]').first();
   if (!(await pw.count()) && (await usr.count())) {
-    await usr.fill(USUARIO);
+    await usr.fill(USUARIO.trim());
     const seguir = page.locator('button[type="submit"], button:has-text("Continuar"), button:has-text("Próximo"), button:has-text("Avançar")').first();
     if (await seguir.count()) await seguir.click(); else await usr.press("Enter");
     await page.waitForTimeout(2500);
   }
   await pw.first().waitFor({ timeout: 30000 });
-  if (await usr.count() && !(await usr.inputValue().catch(() => ""))) await usr.fill(USUARIO);
+  if (await usr.count() && !(await usr.inputValue().catch(() => ""))) await usr.fill(USUARIO.trim());
   await pw.first().fill(SENHA);
   await print(page, `${sub}-2-preenchido`);
   const btn = page.locator('button:has-text("Fazer login"), button[type="submit"]:not([id^="hj-"]), button:has-text("Entrar")').first();
@@ -69,7 +69,13 @@ async function entrar(page, sub) {
   await page.waitForTimeout(3000);
   console.log("  depois do login:", page.url());
   await print(page, `${sub}-3-depois-login`);
-  if (await page.locator('input[type="password"]').count()) throw new Error("o login não passou (confira usuário e senha nos secrets)");
+  if (await page.locator('input[type="password"]').count()) {
+    const msg = (await page.evaluate(() => document.body.innerText)).replace(/\s+/g, " ").slice(0, 600);
+    const cap = await page.evaluate(() => !!document.querySelector('iframe[src*="recaptcha"], iframe[src*="hcaptcha"], iframe[src*="turnstile"], .g-recaptcha, [data-sitekey]'));
+    console.log("  texto da página depois de tentar entrar:", msg);
+    console.log("  captcha na página:", cap, "| e-mail preenchido com", USUARIO.length, "caracteres, com @:", USUARIO.includes("@"), "| espaços nas pontas:", USUARIO !== USUARIO.trim() || SENHA !== SENHA.trim());
+    throw new Error("o login não passou");
+  }
 }
 
 async function listar(page, sub) {
