@@ -188,7 +188,7 @@ function vazio(){
 
 /* ---------- Início ---------- */
 R.inicio=function(){
-  var now=Date.now(),h=new Date().getHours(),sau=h<12?"Bom dia":h<18?"Boa tarde":"Boa noite";
+  var now=Date.now(),h=new Date().getHours(),sau=h<5?"Boa noite":h<12?"Bom dia":h<18?"Boa tarde":"Boa noite";
   var livres=D.p.filter(function(p){return p[F.disp]>0}).length,ulv=D.p.reduce(function(a,p){return a+(p[F.disp]||0)},0);
   var dias=[];for(var i=6;i>=0;i--){dias.push({t:sod(now-i*DAY),n:0,v:0,r:0,pr:0})}
   D.m.forEach(function(x){var t=x[4]*1000;for(var i=0;i<7;i++){if(t>=dias[i].t&&t<dias[i].t+DAY){if(x[3]==="vendida"){dias[i].n++;dias[i].v+=x[5]||0}else if(x[3]==="reservada")dias[i].r++;else if(x[3]==="processo_final")dias[i].pr++}}});
